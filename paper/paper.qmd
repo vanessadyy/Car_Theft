@@ -2,9 +2,8 @@
 title: "Canada’s Battle Against Car Theft: Progress Amid Persistent Challenges "
 subtitle: "Government measures and public vigilance show promise, but organized theft networks remain a concern."
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Yiyue Deng
+thanks: "Code and data are available at: [https://github.com/vanessadyy/Car_Theft](https://github.com/vanessadyy/Car_Theft)."
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
