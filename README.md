@@ -1,8 +1,9 @@
-# Starter folder
+# Battle Against Car Theft: Progress Amid Persistent Challenges
+## Government measures and public vigilance show promise, but organized theft networks remain a concern.
 
 ## Overview
 
-This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
+This repository serves as a reproducible resource for an article exploring the current state of car theft in Canada, recent government initiatives, and the ongoing challenges in addressing this pervasive issue.
 
 
 ## File Structure
