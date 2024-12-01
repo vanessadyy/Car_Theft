@@ -7,9 +7,17 @@ thanks: "Code and data are available at: [https://github.com/vanessadyy/Car_Thef
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
-format: pdf
-number-sections: true
+include-before:
+- '\newpage'
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
 bibliography: references.bib
+csl: apa6.csl
+editor_options: 
+chunk_output_type: console
 ---
 
 ```{r}
@@ -18,17 +26,175 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
+library(tidyverse)
+library(here)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(knitr)
+library(kableExtra)
 ```
 
+\newpage
 
 # Introduction
 
-Car theft has long been a concern in Canada, but recent years have witnessed a dramatic surge in reported cases, driven by sophisticated theft operations. Criminal networks often target vehicles with advanced keyless entry systems, exploiting vulnerabilities in wireless technology. These stolen vehicles are frequently exported overseas or dismantled for parts, making recovery difficult.
+Vehicle theft has become a widespread public concern in Canada, leaving many citizens feeling helpless and frustrated. As car theft incidents continue to rise, police chiefs have made surprising recommendations, including advising residents to leave their car keys near the door to avoid violent confrontations during break-ins. This suggestion sparked public outrage, with many criticizing it online as absurd and unreasonable. The widespread public discourse escalated the issue into a national battle against crime.
 
-In 2024, the Insurance Bureau of Canada reported a 19% reduction in theft claims during the first half of the year, attributed to increased law enforcement efforts and public awareness campaigns. Notable initiatives include the Canadian government’s National Action Plan to Combat Car Theft, which emphasizes collaboration between federal agencies, law enforcement, and border security.
+## The Scale of the Problem
 
-Despite these efforts, challenges persist. Border authorities continue to intercept stolen vehicles destined for international markets, and data suggests that many thefts remain unreported or unresolved. The fight against car theft in Canada highlights the need for continuous innovation, community cooperation, and robust legal frameworks to address this evolving crime. This article delves into the current state of car theft in Canada, recent government actions, and the ongoing challenges in combating this widespread crime.
+The scale of vehicle theft in Canada is alarming, exposing government inefficiency in tackling the problem. The reaction from law enforcement has been equally unexpected, with officers treating theft as an inevitable occurrence and even providing rationales for its prevalence. While insurance companies offer quick resolutions for stolen vehicle claims, this comes at a cost. Insurers are not charitable organizations, and frequent claims could lead to higher premiums or even the loss of insurance eligibility for some car owners. The reliance on insurance as a remedy highlights the authorities' decision to abandon pursuit of stolen vehicles, shifting the burden onto vehicle owners to seek reimbursement.
+
+## The Vicious Cycle of Vehicle Theft
+
+The indifferent attitude of law enforcement, coupled with lenient legal consequences, has fueled an annual increase in car thefts, pushing Canada into a vicious cycle of buying and stealing vehicles. The legal responsibilities surrounding car theft and the evasive accountability of international import companies reflect the complexities of organized crime. A large portion of stolen vehicles ends up in the Middle East and Africa, particularly Nigeria, where demand for high-quality second-hand cars is strong. The COVID-19 pandemic and geopolitical conflicts have exacerbated supply shortages, causing car prices in the Middle East to surge and further incentivizing theft.
+
+## The Global Supply Chain of Stolen Vehicles
+
+The vehicle theft industry operates as an international supply chain, where cars of varying quality are allocated to different markets, creating a clear hierarchy. High-value vehicles are often shipped to affluent buyers, while lower-tier models serve other regions. The organized and systematic nature of these operations underscores the challenges faced by Canadian authorities in addressing this growing issue. Without comprehensive legal reforms and stricter enforcement measures, the country risks further entrenchment in this illicit cycle, with profound economic and social consequences.
+
+## Public Response and Anti-Theft Measures
+
+Faced with insufficient responses from the police, many vehicle owners have begun implementing their own anti-theft measures. However, professional thieves often view these devices as minor obstacles, and even robust anti-theft systems have limitations. High installation costs and vulnerabilities in extreme weather conditions further undermine their effectiveness. Some individuals attempt to protect their vehicles by parking in neighborhoods with higher police presence or near police stations. However, such measures do not guarantee safety, as evidenced by reports of police chiefs’ vehicles being stolen in broad daylight. These incidents highlight the audacity of thieves and have led to online ridicule of police authorities for failing to practice basic precautions.
+
+## The National Action Plan
+
+Under pressure from the public and media, the Canadian government introduced a series of policies in early 2024 as part of a “National Action Plan” to combat auto theft. The key components of the plan include:
+
+- **Amendments to Criminal Laws**: Revising legislation to provide law enforcement and prosecutors with enhanced tools to tackle vehicle theft.
+- **Changes to the Radiocommunication Act**: Tightening regulations on radio devices commonly used in car thefts.
+- **Enhanced Intelligence and Information Sharing**: Promoting better collaboration among municipal, provincial, federal, and international agencies.
+- **Technology Deployment**: Leveraging advanced technologies such as scanning systems, data analytics, and GPS tracking to enhance inspection efficiency, particularly at ports and rail terminals.
+- **Specialized Training**: Offering targeted training programs for law enforcement officers to improve their capacity to investigate vehicle theft cases.
+- **Intergovernmental Task Force**: Creating a National Vehicle Theft Task Force to enhance coordination among government bodies.
+- **Support for Anti-Theft Technology Development**: Encouraging innovation and wider adoption of commercial anti-theft technologies.
+
+## Interim Result and Aim of the Paper
+
+Several months have passed since the plan's implementation. Open Data Toronto has published theft-from-motor-vehicle data for Toronto reported from January 2014 to September 2024. To assess interim results, we analyzed this dataset to evaluate the effectiveness of the government's actions. Our objective is to produce statistically objective conclusions that quantify the plan's impact.
+
+# Data {#sec-data}
+
+Since 2014, the Toronto Police Service has been collecting auto theft data in digital format. The data is updated and maintained quarterly, with public access provided via Open Data Toronto. This dataset includes approximate locations of car theft incidents, facilitating the analysis of geographic trends over time. The latest update, released on October 19, 2024, covers reported theft cases up to September 30, 2024.
+
+## Data Source
+
+The dataset used in this study was obtained from [Open Data Toronto](https://open.toronto.ca/dataset/deaths-of-shelter-residents/). The raw dataset comprises the following [key fields](@tbl-variable_description):
+
+```{r}
+#| label: tbl-variable_description
+#| tbl-cap: "Raw Variable Description"
+#| echo: false
+#| warning: false
+#| message: false
+
+variable_description <- data.frame(
+  Column = c(
+    "_id", "EVENT_UNIQUE_ID", "REPORT_DATE", "OCC_DATE", "REPORT_YEAR",
+    "REPORT_MONTH", "REPORT_DAY", "REPORT_DOY", "REPORT_DOW", "REPORT_HOUR",
+    "OCC_YEAR", "OCC_MONTH", "OCC_DAY", "OCC_DOY", "OCC_DOW", "OCC_HOUR",
+    "DIVISION", "LOCATION_TYPE", "PREMISES_TYPE", "UCR_CODE", "UCR_EXT",
+    "OFFENCE", "MCI_CATEGORY", "HOOD_158", "LONG_WGS84", "LAT_WGS84"
+  ),
+  Description = c(
+    "Unique row identifier for Open Data database",
+    "Offence Number",
+    "Date Offence was Reported",
+    "Date of Offence",
+    "Year Offence was Reported",
+    "Month Offence was Reported",
+    "Day of the Month Offence was Reported",
+    "Day of the Year Offence was Reported",
+    "Day of the Week Offence was Reported",
+    "Hour Offence was Reported",
+    "Year Offence Occurred",
+    "Month Offence Occurred",
+    "Day of the Month Offence Occurred",
+    "Day of the Year Offence Occurred",
+    "Day of the Week Offence Occurred",
+    "Hour Offence Occurred",
+    "Police Division where Offence Occurred",
+    "Location Type of Offence",
+    "Premises Type of Offence",
+    "UCR Code for Offence",
+    "UCR Extension for Offence",
+    "Title of Offence",
+    "MCI Category of Occurrence",
+    "Identifier of Neighbourhood using City of Toronto's new 158 neighbourhood structure",
+    "Longitude coordinate",
+    "Latitude coordinate"
+  )
+)
+# Render the table
+kable(variable_description, col.names = c("Column", "Description")) %>% kable_styling(full_width = FALSE) %>%  column_spec(1, width = "4cm") %>% column_spec(2, width = "8cm")
+```
+
+## Data Notes
+
+This dataset provides detailed information about auto theft cases reported in Toronto. Each row corresponds to a unique occurrence and includes both temporal and spatial details about the offence. The data can be used to analyze trends over time and across neighborhoods in the city.
+
+- **Temporal Variables**: Columns such as `REPORT_DATE`, `REPORT_YEAR`, and `OCC_DATE` provide insights into when offences were reported or occurred.
+
+- **Spatial Variables**: Columns like `DIVISION`, `HOOD_158`, `LONG_WGS84`, and `LAT_WGS84` enable spatial analysis and visualization of offences across Toronto.
+
+- **Categorical Variables**: Fields such as `LOCATION_TYPE`, `PREMISES_TYPE`, and `OFFENCE` classify the nature and context of the reported incidents.
+
+
+## Variables of Interest
+
+Dependent or duplicated information was recorded using different variables in the dataset. To avoid redundancy, for each scenario, we selected representative variables from the categories of temporal, spatial, and crime severity information related to theft crimes. The selected variables are outlined below:
+
+- **Temporal Information**
+We selected variables representing the occurrence date and excluded the reported date. The following variables were retained for analysis:
+  - OCC_DATE
+  - OCC_YEAR
+  - OCC_MONTH
+  - OCC_DAY
+  - OCC_DOW
+  - OCC_HOUR
+
+- **Spatial Information**
+Key spatial information is represented by the police division number, as well as the longitude and latitude of the theft location. Additionally, the location type was included for further context. The following variables were retained:
+  - DIVISION
+  - LONG_WGS84
+  - LAT_WGS84
+  - PREMISES_TYPE
+
+- **Crime Severity Information**
+To capture the severity of theft crimes, we selected the UCR code and offense title as indicators. The following variables were retained:
+  - UCR_CODE
+  - OFFENCE
+
+## Software and Packages
+
+We used R 4.3 for analysis and followed a public template @citeR@citeRohan. and a collection of R packages were used in this study:
+
+- tidyverse @Citetidyverse
+- here @Citehere
+- lubridate @Citelubridate
+- ggplot2 @Citeggplot2
+- scales @Citescales
+- knitr @Citeknitr
+- kableExtra
+
+## Data Management
+
+Data cleaning steps are described in the [Appendix](#sec-appendix). A sample of the cleaned data is presented in Table 2-4. Among all variables, Year, Total_Death, Male, and Female are coded as integers, Month is coded as abbreviations in character format, and Time is coded in date format. After data cleaning, there are no missing values remaining in the dataset.
+
+```{r}
+#| echo: false
+#| warning: false
+
+i_am("README.md")
+dt <- read_csv(here("data","analysis_data","analysis_data.csv"))
+data_part1 <- kable(head(dt)[, 1:6],caption = "Sample of Clean Data: Part 1")
+data_part2 <- kable(head(dt)[, 7:10],caption = "Sample of Clean Data: Part 2")
+data_part3 <- kable(head(dt)[, 11:13],caption = "Sample of Clean Data: Part 3")
+data_part1
+data_part2
+data_part3
+```
+
 
 
 Estimand paragraph
@@ -48,7 +214,7 @@ Telegraphing paragraph: The remainder of this paper is structured as follows. @s
 
 ## Overview
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
+We use the statistical programming language R .... Our data .... Following , we consider...
 
 Overview text
 
@@ -62,42 +228,10 @@ Add graphs, tables and text. Use sub-sub-headings for each outcome variable or u
 
 
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+Some of our data is of penguins (), from .
 
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
-
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
-```
 
 Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
-
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
-```
 
 Talk way more about it. 
 
@@ -118,7 +252,7 @@ Use sub-sub-headings for each outcome variable and feel free to combine a few in
 
 The goal of our modelling strategy is twofold. Firstly,...
 
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
+Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix ].
 
 ## Model set-up
 
@@ -133,7 +267,7 @@ y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
 \sigma &\sim \mbox{Exponential}(1)
 \end{align}
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+We run the model in R 
 
 
 ### Model justification
@@ -145,36 +279,7 @@ We can use maths by including latex between dollar signs, for instance $\theta$.
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
-
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
-
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
-```
-
+Our results are summar
 
 
 
@@ -207,52 +312,21 @@ Weaknesses and next steps should also be included.
 
 ## Posterior predictive check
 
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
 ## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
+\newpage
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
+# Appendix {#sec-appendix .unnumbered}
 
-plot(first_model, "trace")
+**Data Cleaning Steps**
 
-plot(first_model, "rhat")
-```
+Raw data from Open Data Toronto were prepared, so we did not need to perform many cleaning steps. A few cleaning steps are as follows:
 
+- Recode missing values for genders other than male or female.
+- Standardize column names.
+- After realizing that there were too many missing values for other genders (over 90%), we dropped that variable.
+- Create a new Time variable to represent the first day of each recorded month in date format.
 
 
 \newpage

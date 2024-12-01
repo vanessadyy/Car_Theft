@@ -1,5 +1,4 @@
-# Battle Against Car Theft: Progress Amid Persistent Challenges
-## Government measures and public vigilance show promise, but organized theft networks remain a concern.
+# Battle Against Car Theft: Progress Amid Persistent Challenges -- Government measures and public vigilance show promise, but organized theft networks remain a concern.
 
 ## Overview
 
