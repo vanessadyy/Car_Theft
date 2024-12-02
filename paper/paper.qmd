@@ -90,7 +90,7 @@ The dataset used in this study was obtained from [Open Data Toronto](https://ope
 
 variable_description <- data.frame(
   Column = c(
-    "_id", "EVENT_UNIQUE_ID", "REPORT_DATE", "OCC_DATE", "REPORT_YEAR",
+    "X_id", "EVENT_UNIQUE_ID", "REPORT_DATE", "OCC_DATE", "REPORT_YEAR",
     "REPORT_MONTH", "REPORT_DAY", "REPORT_DOY", "REPORT_DOW", "REPORT_HOUR",
     "OCC_YEAR", "OCC_MONTH", "OCC_DAY", "OCC_DOY", "OCC_DOW", "OCC_HOUR",
     "DIVISION", "LOCATION_TYPE", "PREMISES_TYPE", "UCR_CODE", "UCR_EXT",

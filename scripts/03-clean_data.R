@@ -1,44 +1,41 @@
 #### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Cleans the raw car theft data
+# Author:  Yiyue Deng
+# Date: 12/01/2024
+# Contact: yiyue.deng@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: Packages under workspace setup must be installed
+# This script is used to clean raw car theft data downloaded directly from open data Toronto
+# Refer to https://github.com/vanessadyy/Car_Theft for more details
 
 #### Workspace setup ####
 library(tidyverse)
+library(rstudioapi)
+library(janitor)
 
+# Set data directory and read raw data
+fd <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/../")  
+setwd(fd)
+raw_data <- read_csv("./data/raw_data/raw_data.csv")
+names(raw_data)
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
-
+# Only variables of interest are retained. Please refer to the paper for the list of variables of interest and reasons.
+# Only records occurred after 2014 were retained
+# Any records with missing data were excluded
 cleaned_data <-
-  raw_data |>
-  janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
+  raw_data %>%
+  select(X_id,	OCC_DATE,	OCC_YEAR,	OCC_MONTH,	
+         OCC_DAY,	OCC_DOW,	OCC_HOUR,	DIVISION,	
+         PREMISES_TYPE,	UCR_CODE,	OFFENCE,	
+         LONG_WGS84,	LAT_WGS84) %>%
+  filter(OCC_YEAR > 2013,
+         OCC_YEAR != "None") %>%
   mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+    OCC_YEAR = as.numeric(OCC_YEAR),
+    OCC_DAY = as.numeric(OCC_DAY)) %>%
+    drop_na()
 
 #### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+write_csv(cleaned_data, "./data/analysis_data/analysis_data.csv")
+
+str(cleaned_data)

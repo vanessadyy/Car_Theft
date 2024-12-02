@@ -1,20 +1,24 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the simulated Australian 
-  #electoral divisions dataset.
-# Author: Rohan Alexander
-# Date: 26 September 2024
-# Contact: rohan.alexander@utoronto.ca
+# Purpose: Tests the structure and validity of the simulated car theft data of Toronto 
+# Author: Yiyue Deng
+# Date: 12/01/2024
+# Contact: yiyue.deng@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: 
-  # - The `tidyverse` package must be installed and loaded
-  # - 00-simulate_data.R must have been run
-# Any other information needed? Make sure you are in the `starter_folder` rproj
+# Pre-requisites: Packages under workspace setup must be installed
+# Pre-requisites: 00-simulate_data.R must have been run
+# Refer to https://github.com/vanessadyy/Car_Theft for more details
 
 
 #### Workspace setup ####
 library(tidyverse)
+library(rstudioapi)
 
-analysis_data <- read_csv("data/00-simulated_data/simulated_data.csv")
+#### read simulated data ####
+
+fd <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/../")  
+setwd(fd)
+
+analysis_data <- read_csv("./data/simulated_data/simulated_data.csv")
 
 # Test if the data was successfully loaded
 if (exists("analysis_data")) {
@@ -26,45 +30,60 @@ if (exists("analysis_data")) {
 
 #### Test data ####
 
-# Check if the dataset has 151 rows
-if (nrow(analysis_data) == 151) {
-  message("Test Passed: The dataset has 151 rows.")
+# Check if the dataset has 100 rows
+if (nrow(analysis_data) == 100) {
+  message("Test Passed: The dataset has 100 rows.")
 } else {
-  stop("Test Failed: The dataset does not have 151 rows.")
+  stop("Test Failed: The dataset does not have 100 rows.")
 }
 
-# Check if the dataset has 3 columns
-if (ncol(analysis_data) == 3) {
-  message("Test Passed: The dataset has 3 columns.")
+# Check if the dataset has 13 columns
+if (ncol(analysis_data) == 13) {
+  message("Test Passed: The dataset has 13 columns.")
 } else {
-  stop("Test Failed: The dataset does not have 3 columns.")
+  stop("Test Failed: The dataset does not have 13 columns.")
 }
 
-# Check if all values in the 'division' column are unique
-if (n_distinct(analysis_data$division) == nrow(analysis_data)) {
-  message("Test Passed: All values in 'division' are unique.")
+# Check if all values in the 'X_id' column are unique
+if (n_distinct(analysis_data$X_id) == nrow(analysis_data)) {
+  message("Test Passed: All values in 'X_id' are unique.")
 } else {
-  stop("Test Failed: The 'division' column contains duplicate values.")
+  stop("Test Failed: The 'X_id' column contains duplicate values.")
 }
 
-# Check if the 'state' column contains only valid Australian state names
-valid_states <- c("New South Wales", "Victoria", "Queensland", "South Australia", 
-                  "Western Australia", "Tasmania", "Northern Territory", 
-                  "Australian Capital Territory")
+# Check if the 'DIVISION' column contains only valid Australian state names
+valid_DIVISION <- c("D11", "D12", "D13", "D14", "D22", "D23", "D31", "D32", "D33", 
+                  "D41", "D42", "D43", "D51", "D52", "D53", "D54", "D55")
 
-if (all(analysis_data$state %in% valid_states)) {
-  message("Test Passed: The 'state' column contains only valid Australian state names.")
+if (all(analysis_data$DIVISION %in% valid_DIVISION)) {
+  message("Test Passed: The 'DIVISION' column contains only valid Toronto police division names.")
 } else {
-  stop("Test Failed: The 'state' column contains invalid state names.")
+  stop("Test Failed: The 'DIVISION' column contains invalid Toronto police division names.")
 }
 
-# Check if the 'party' column contains only valid party names
-valid_parties <- c("Labor", "Liberal", "Greens", "National", "Other")
+# Check if the 'OFFENCE' column contains only valid crime types of car theft cases
+valid_OFFENCE <- c("Theft From Motor Vehicle Over", "Theft From Motor Vehicle Under")
 
-if (all(analysis_data$party %in% valid_parties)) {
-  message("Test Passed: The 'party' column contains only valid party names.")
+if (all(analysis_data$OFFENCE %in% valid_OFFENCE)) {
+  message("Test Passed: The 'OFFENCE' column contains only valid crime types of car theft cases.")
 } else {
-  stop("Test Failed: The 'party' column contains invalid party names.")
+  stop("Test Failed: The 'OFFENCE' column contains invalid crime types of car theft cases.")
+}
+
+# Check if the 'PREMISES_TYPE' column contains only valid location types
+valid_PREMISES_TYPE <- c("Apartment", "Commercial", "Educational", "House", "Other", "Outside", "Transit")
+
+if (all(analysis_data$PREMISES_TYPE %in% valid_PREMISES_TYPE)) {
+  message("Test Passed: The 'PREMISES_TYPE' column contains only valid location types.")
+} else {
+  stop("Test Failed: The 'PREMISES_TYPE' column contains invalid location types.")
+}
+
+# Chec if 'OCC_DATE' is between 2014.01.01 to 2024.09.30
+if (all(analysis_data$OCC_DATE >= as.Date("2014-01-01") & analysis_data$OCC_DATE <= as.Date("2024-09-30") )) {
+  message("Test Passed: The 'OCC_DATE' column contains only dates between 2014.01.01 to 2024.09.30.")
+} else {
+  stop("Test Failed: The 'OCC_DATE' column contains only dates between 2014.01.01 to 2024.09.30.")
 }
 
 # Check if there are any missing values in the dataset
@@ -74,16 +93,3 @@ if (all(!is.na(analysis_data))) {
   stop("Test Failed: The dataset contains missing values.")
 }
 
-# Check if there are no empty strings in 'division', 'state', and 'party' columns
-if (all(analysis_data$division != "" & analysis_data$state != "" & analysis_data$party != "")) {
-  message("Test Passed: There are no empty strings in 'division', 'state', or 'party'.")
-} else {
-  stop("Test Failed: There are empty strings in one or more columns.")
-}
-
-# Check if the 'party' column has at least two unique values
-if (n_distinct(analysis_data$party) >= 2) {
-  message("Test Passed: The 'party' column contains at least two unique values.")
-} else {
-  stop("Test Failed: The 'party' column contains less than two unique values.")
-}
