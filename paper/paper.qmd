@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: [https://github.com/vanessadyy/Car_Theft](https://github.com/vanessadyy/Car_Theft)."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "Vehicle theft has become a significant public concern in Canada, highlighting both systemic challenges and promising governmental interventions. This study evaluates the effectiveness of the 2024 National Action Plan, which led to a 16.9% reduction in the mean monthly count of car thefts in Toronto. Spatial and temporal analyses reveal variations across police divisions and premise types, emphasizing the need for targeted strategies. Despite encouraging trends, organized theft networks and data limitations underscore the need for further research and adaptive policymaking."
 include-before:
 - '\newpage'
 format:
@@ -26,13 +26,19 @@ chunk_output_type: console
 #| message: false
 
 library(tidyverse)
-library(tidyverse)
 library(here)
 library(lubridate)
 library(ggplot2)
 library(scales)
 library(knitr)
 library(kableExtra)
+library(distributions3)
+library(topmodels)
+library(MASS)
+library(sf)
+library(rstudioapi)
+library(opendatatoronto)
+library(janitor)
 ```
 
 \newpage
@@ -72,6 +78,10 @@ Under pressure from the public and media, the Canadian government introduced a s
 ## Interim Result and Aim of the Paper
 
 Several months have passed since the plan's implementation. Open Data Toronto has published theft-from-motor-vehicle data for Toronto reported from January 2014 to September 2024. To assess interim results, we analyzed this dataset to evaluate the effectiveness of the government's actions. Our objective is to produce statistically objective conclusions that quantify the plan's impact.
+
+## Estimand
+
+The primary estimand of this study is the monthly reduction in mean counts of car theft cases in Toronto following the implementation of the National Action Plan. This is defined as the difference in the mean monthly car theft count before and after January 2024, when the plan starts. The estimand will be evaluated across all vehicle theft records reported in Toronto, stratified by key covariates. This analysis assumes that the observed trends are not confounded by unrelated temporal factors.
 
 # Data {#sec-data}
 
@@ -115,7 +125,7 @@ variable_description <- data.frame(
     "Hour Offence Occurred",
     "Police Division where Offence Occurred",
     "Location Type of Offence",
-    "Premises Type of Offence",
+    "premise types of Offence",
     "UCR Code for Offence",
     "UCR Extension for Offence",
     "Title of Offence",
@@ -167,7 +177,7 @@ To capture the severity of theft crimes, we selected the UCR code and offense ti
 
 ## Software and Packages
 
-We used R 4.3 for analysis and followed a public template @citeR@citeRohan. and a collection of R packages were used in this study:
+We used R 4.3 for analysis and followed a public template @citeR@citeRohan, and a collection of R packages were used in this study:
 
 - tidyverse @Citetidyverse
 - here @Citehere
@@ -175,11 +185,18 @@ We used R 4.3 for analysis and followed a public template @citeR@citeRohan. and 
 - ggplot2 @Citeggplot2
 - scales @Citescales
 - knitr @Citeknitr
-- kableExtra
+- kableExtra @citekableExtra
+- topmodels @citetopmodels
+- distributions3 @citedistributions3
+- MASS @citemass
+- sf @citesf
+- rstudioapi @citerstudioapi
+- opendatatoronto @citeopendatatoronto
+- janitor @citejanitor
 
 ## Data Management
 
-Data cleaning steps are described in the [Appendix](#sec-appendix). A sample of the cleaned data is presented in Table 2-4. Among all variables, Year, Total_Death, Male, and Female are coded as integers, Month is coded as abbreviations in character format, and Time is coded in date format. After data cleaning, there are no missing values remaining in the dataset.
+Data cleaning steps are described in the [Appendix](#sec-appendix). A sample set of the cleaned data is presented in Table 2-4. Among all variables, Year, Total_Death, Male, and Female are coded as integers, Month is coded as abbreviations in character format, and Time is coded in date format. After data cleaning, there are no missing values remaining in the dataset.
 
 ```{r}
 #| echo: false
@@ -195,109 +212,406 @@ data_part2
 data_part3
 ```
 
+# Methods {#sec-methods}
+
+## Poisson Regression
+
+The Poisson distribution is utilized to model the monthly count of car thefts, with a binary variable "action" serving as an indicator of whether the time of theft occurrence falls after the implementation of the national action plan. The following are the formulas for the Poisson regression model:
+
+$$
+y_i \sim \text{Poisson}(\lambda_i)
+$$
+
+$$
+\log(\lambda_i) = \beta_0 + \beta_1 \cdot \text{time} + \beta_2 \cdot \text{action} + \cdots + \beta_k \cdot \text{covariate}_k
+$$
+where y_i is the count of car theft occurance.
+
+We ran a generalized linear model with a log link function, ensuring that all of the predicted values will be positive, and using a Poisson error distribution.
+
+## Quasi-likelihood Poisson Regression
+
+To address the potential for overdispersion, we also performed a quasi-likelihood Poisson regression. This approach uses the same mean function as standard Poisson regression but estimates parameters using quasi-maximum likelihood estimation or generalized estimating equations, with adjustments for an estimated dispersion parameter. We compared the results from Poisson and Quasi-Poisson regression models, selecting the more suitable model based on a comprehensive diagnostic evaluation. This assessment included checks for overdispersion, identification of outliers, and analysis of residual distribution. Further details are provided in the [results section]{@sec-results}.
+
+# Results {#sec-results}
+
+## Descriptives
+
+```{r}
+#| label: fig-quarterly-car-theft
+#| echo: false
+#| warning: false
+#| fig-cap: "Histogram of quarterly count of car theft in Toronto"
+
+quarterly_counts <- dt %>%
+  mutate(
+    YEARQUARTER = paste0(format(OCC_DATE, "%Y"), "-Q", ceiling(as.numeric(format(OCC_DATE, "%m")) / 3))  # Extract year and quarter
+  ) %>%
+  group_by(YEARQUARTER) %>%
+  summarise(Crime_Count = n(), .groups = "drop") %>%
+  mutate(
+    time = as.numeric(as.Date(paste0(substr(YEARQUARTER, 1, 4), "-", (as.numeric(substr(YEARQUARTER, 7, 7)) - 1) * 3 + 1, "-01"))),
+    action = ifelse(time >= as.numeric(as.Date("2024-01-01")), 1, 0)
+  )
+
+ggplot(quarterly_counts, aes(x = YEARQUARTER, y = Crime_Count)) +
+  geom_col(fill = "steelblue", color = "black") +
+  labs(
+    x = "Month",
+    y = "Number of Cases"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Before running the model, we firstly draw a few figures and tables as descriptives to have a quickview of the data.
+
+### Timely Trend (Quarterly)
+
+@fig-quarterly-car-theft illustrates the overall trend in the quarterly count of car theft cases in Toronto since 2014. The number of cases generally fluctuated around 2,000 per quarter. Notable periods of lower counts include 2016 and the first two quarters of 2021, while higher counts were observed during 2020 and the period from 2022 to 2023. A decline is also apparent after 2024, though further evidence is needed to confirm this trend.
+
+### Spatial View
+
+```{r}
+#| label: fig-Spatial-View
+#| echo: false
+#| warning: false
+#| fig-cap: "Spatial view of vehicle theft cases by division for September 2024"
+
+division_sf <- st_as_sf(dt %>% filter(OCC_YEAR==2024, OCC_MONTH=="September"), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+  group_by(DIVISION) %>%
+  summarise(geometry = st_combine(geometry)) %>%
+  st_cast("POLYGON")
+ggplot(data = division_sf) +
+  geom_sf(aes(fill = factor(DIVISION)), color = "black") +
+  scale_fill_viridis_d(name = "Division ID") +
+  labs( x = "Longitude", y = "Latitude") +
+  theme_minimal()
+```
+
+@fig-Spatial-View illustrates the spatial distribution of car theft occurrences in September 2024 across police divisions. @fig-division-chart displays the overall count of car theft cases by division. Notably, Division D54 reported the lowest number of car theft cases, with Divisions D11 to D13 also showing relatively low counts, while Division D33 recorded the highest. Further analysis is needed, considering additional information about public safety conditions within these division areas.
+
+```{r}
+#| label: fig-division-chart
+#| echo: false
+#| warning: false
+#| fig-cap: "Barchart of count of occurrences by divisions"
+
+ggplot(dt, aes(x = DIVISION)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(
+    x = "DIVISION",
+    y = "Number of Occurrences"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Premise Types
+
+@fig-premises-chart reveals that car theft cases occurred most frequently outside, followed by educational institutions, while transit locations reported the fewest cases. Across all premise types, two periods of increase were observed in 2019 and 2022-2023, with a decline noted after 2024.
+
+```{r}
+#| label: fig-premises-chart
+#| echo: false
+#| warning: false
+#| fig-cap: "Linechart of count of occurrences by premise types and year"
+
+table_data <- table(dt$PREMISES_TYPE, dt$OCC_YEAR)
+df_table <- as.data.frame(table_data)
+colnames(df_table) <- c("PREMISES_TYPE", "OCC_YEAR", "Count")
+df_table$OCC_YEAR <- as.numeric(as.character(df_table$OCC_YEAR))
+ggplot(df_table, aes(x = OCC_YEAR, y = Count, color = PREMISES_TYPE, group = PREMISES_TYPE)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Count of Cases",
+    color = "premise types"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Offence Types
+
+@fig-offence-chart shows that most car theft cases were categorized as "Theft From Motor Vehicle Under," involving financial losses of less than $5,000. The number of severe cases remained relatively stable over the years, while lighter cases experienced two increases in 2019 and 2022, with declines observed in 2016 and after 2024.
+
+```{r}
+#| label: fig-offence-chart
+#| echo: false
+#| warning: false
+#| fig-cap: "Linechart of count of occurrences by offence types and year"
+
+offence_table <- table(dt$OFFENCE, dt$OCC_YEAR)
+df_offence <- as.data.frame(offence_table)
+colnames(df_offence) <- c("OFFENCE", "OCC_YEAR", "Count")
+df_offence$OCC_YEAR <- as.numeric(as.character(df_offence$OCC_YEAR))
+ggplot(df_offence, aes(x = OCC_YEAR, y = Count, color = OFFENCE, group = OFFENCE)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Count of Cases",
+    color = "Offence Type"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Day of the Week
+
+@fig-dow-chart indicates that car theft crimes were distributed relatively evenly across all days of the week, with a slight increase observed on Fridays.
+
+```{r}
+#| label: fig-dow-chart
+#| echo: false
+#| warning: false
+#| fig-cap: "Barchart of count of occurrences by day of the week"
+
+ggplot(dt, aes(x = OCC_DOW)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(
+    x = "Day of the Week",
+    y = "Number of Occurrences"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Day of the Month
+
+Interestingly, @fig-day-chart reveals that car theft cases occurred most frequently on the first day of the month and least often at the end of the month. The difference could be as high as 1,000 cases over a 10-year period, equivalent to approximately 30%.
+
+```{r}
+#| label: fig-day-chart
+#| echo: false
+#| warning: false
+#| fig-cap: "Barchart of count of occurrences by day of the month"
+
+ggplot(dt, aes(x = OCC_DAY)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(
+    x = "Day of the Month",
+    y = "Number of Occurrences"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Poisson Model
+
+### Point Estimates
+
+@tbl-Poisson indicates that the variable "action" had a significant effect on the mean count of car theft cases. Specifically, after the implementation of the national action plan, there was an approximate 1−exp(−0.185)=1−0.831=16.9% reduction in the mean count of car theft cases. This result highlights the potential effectiveness of the action plan in mitigating car theft, suggesting a notable decrease in incidents following its introduction.
+
+```{r}
+#| label: tbl-Poisson
+#| echo: false
+#| warning: false
+#| tbl-cap: "Poisson regression results"
+
+monthly_counts_all <- dt %>%
+  mutate(
+    YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+  ) %>%
+  group_by(YEARMONTH) %>%
+  summarise(Crime_Count = n(), .groups = "drop") %>%
+  mutate(
+    time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+    action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+poisson_model_all <- glm(
+  Crime_Count ~ time +action,
+  family = poisson(link = "log"),
+  data = monthly_counts_all
+)
+kable(summary(poisson_model_all)$coefficients)
+```
+
+### Prediction
+
+Predictions from the model in @fig-Poisson-pred demonstrate a significant difference in the expected monthly car theft counts, with post-2024 counts being approximately 100 cases lower per month on average. This reduction suggests a measurable impact of national action plan starting in 2024.
+
+```{r}
+#| label: fig-Poisson-pred
+#| echo: false
+#| warning: false
+#| fig-cap: "Poisson regression prediction"
+
+monthly_counts_all <- monthly_counts_all %>%
+  mutate(
+    Predicted_Count = predict(poisson_model_all, type = "response")
+  )
+ggplot(monthly_counts_all, aes(x = as.Date(time))) +
+  geom_line(aes(y = Crime_Count, color = "Actual", linetype = "Actual"), size = 1) + # Actual counts
+  geom_line(aes(y = Predicted_Count, color = "Predicted", linetype = "Predicted"), size = 1) + # Predicted counts
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) + # Define line colors
+  scale_linetype_manual(values = c("Actual" = "solid", "Predicted" = "dashed")) + # Define line types
+  labs(
+    x = "Time",
+    y = "Car Theft Crime Count",
+    color = "Type", # Legend title for color
+    linetype = "Type" # Legend title for linetype
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+### Model Diagnosis
+
+The dispersion factor from @tbl-Poisson-dispersion is 14.74, indicating significant overdispersion in the data. The rootogram in @fig-Poisson-rootogram reveals overfitting for crime counts in the range of 700–800 and underfitting for other ranges. Diagnostic plots in @fig-Poisson-diagnosis show no major deflation in the QQ plot, suggesting a normal distribution of residuals. Leverage plots indicate only three significant outliers, corresponding to observations 5, 26, and 122.
+
+```{r}
+#| label: tbl-Poisson-dispersion
+#| echo: false
+#| warning: false
+#| tbl-cap: "Poisson regression dispersion factor"
+
+dispersion_stat <- sum(residuals(poisson_model_all, type = "pearson")^2) / poisson_model_all$df.residual
+kable(data.frame(Stats="Dispersion Factor",Value=dispersion_stat))
+```
+
+```{r}
+#| label: fig-Poisson-rootogram
+#| echo: false
+#| warning: false
+#| fig-cap: "Poisson regression rootogram"
+
+rootogram(poisson_model_all)
+```
+
+```{r}
+#| label: fig-Poisson-diagnosis
+#| echo: false
+#| warning: false
+#| fig-cap: "Poisson regression model diagnosis"
+
+par(mfrow = c(2, 2)) 
+plot(poisson_model_all)
+```
+
+## Quasi-Poisson Model
+
+@tbl-Q-Poisson shows that the Quasi-Poisson model produced the same point estimate for the effect of "action," indicating a 16.9% reduction in the mean count of car theft cases following the implementation of the national action plan. However, the Quasi-Poisson model estimated a larger standard error, resulting in narrower confidence intervals (see @tbl-Q-Poisson), which may provide a more reliable and appropriate measure of precision.
+
+```{r}
+#| label: tbl-Q-Poisson
+#| echo: false
+#| warning: false
+#| tbl-cap: "Quasi-likelihood Poisson regression results"
+
+poisson_model_all2 <- glm(Crime_Count ~ time +action,
+                          family = quasipoisson(),
+                          data = monthly_counts_all)
+
+kable(summary(poisson_model_all2)$coefficients)
+```
+
+```{r}
+#| label: tbl-Q-P-CI
+#| echo: false
+#| warning: false
+#| tbl-cap: "Comparison between Quasi-likelihood Poisson and Poisson estimated confidence intervals"
+
+t1 <- as.data.frame(confint(poisson_model_all))
+t2 <- as.data.frame(confint(poisson_model_all2))
+t1$model_type <- "Poisson Model"
+t2$model_type <- "Quasi-Poisson Model"
+kable(rbind(t1,t2))
+```
 
 
-Estimand paragraph
+## Model with covariates
 
-Results paragraph
+```{r}
+#| label: tbl-Q-P-PREMISES_TYPE
+#| echo: false
+#| warning: false
+#| tbl-cap: "Quasi-likelihood Poisson regression with covariate of premise types"
+monthly_counts_PREMISES_TYPE <- dt %>%
+  mutate(
+    YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+  ) %>%
+  group_by(YEARMONTH,PREMISES_TYPE) %>%
+  summarise(Crime_Count = n(), .groups = "drop") %>%
+  mutate(
+    time = as.Date(paste0(YEARMONTH, "-01")),
+    action = ifelse(time >= as.Date("2024-01-01"),1,0))
+poisson_model_PREMISES_TYPE <- glm(
+  Crime_Count ~ time+PREMISES_TYPE +action,
+  family = quasipoisson(),
+  data = monthly_counts_PREMISES_TYPE
+)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+```
 
-Why it matters paragraph
+```{r}
+#| label: tbl-Q-P-OFFENCE
+#| echo: false
+#| warning: false
+#| tbl-cap: "Quasi-likelihood Poisson regression with covariate of offence types"
+monthly_counts_OFFENCE <- dt %>%
+  mutate(
+    YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+  ) %>%
+  group_by(YEARMONTH,OFFENCE) %>%
+  summarise(Crime_Count = n(), .groups = "drop") %>%
+  mutate(
+    time = as.Date(paste0(YEARMONTH, "-01")),
+    action = ifelse(time >= as.Date("2024-01-01"),1,0))
+poisson_model_OFFENCE <- glm(
+  Crime_Count ~ time+OFFENCE +action,
+  family = quasipoisson(),
+  data = monthly_counts_OFFENCE
+)
+kable(summary(poisson_model_OFFENCE)$coefficients)
+```
 
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
+```{r}
+#| label: tbl-Q-P-DIVISION
+#| echo: false
+#| warning: false
+#| tbl-cap: "Quasi-likelihood Poisson regression with covariate of divisions"
+monthly_counts_DIVISION <- dt %>%
+  mutate(
+    YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+  ) %>%
+  group_by(YEARMONTH,DIVISION) %>%
+  summarise(Crime_Count = n(), .groups = "drop") %>%
+  mutate(
+    time = as.Date(paste0(YEARMONTH, "-01"))  ,
+    action = ifelse(time >= as.Date("2024-01-01"),1,0))
+poisson_model_DIVISION <- glm(
+  Crime_Count ~ time+DIVISION +action,
+  family = quasipoisson(),
+  data = monthly_counts_DIVISION
+)
+kable(summary(poisson_model_DIVISION)$coefficients)
+```
 
-
-
-
-
-
-# Data {#sec-data}
-
-## Overview
-
-We use the statistical programming language R .... Our data .... Following , we consider...
-
-Overview text
-
-## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
-
-## Outcome variables
-
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-
-
-
-Some of our data is of penguins (), from .
-
-
-Talk more about it.
-
-Talk way more about it. 
-
-## Predictor variables
-
-Add graphs, tables and text.
-
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
-
-
-
-
-
-
-
-
-# Model
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix ].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R 
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
-
-# Results
-
-Our results are summar
-
-
+@tbl-Q-P-PREMISES_TYPE, @tbl-Q-P-OFFENCE, and @tbl-Q-P-DIVISION present point estimates from models incorporating different covariates. The results indicate that parking outside significantly increases the risk of car theft occurrences. Additionally, theft categorized as "Theft From Motor Vehicle Under" was associated with a higher number of car theft cases. Among the divisions, Division 32 exhibited the highest risk of car theft occurrence.
 
 # Discussion
 
-## First discussion point {#sec-first-point}
+## Impact of the National Action Plan {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+The results of this study indicate that the National Action Plan implemented in early 2024 has shown a measurable impact on reducing car theft in Toronto. Our analysis demonstrates a 16.9% reduction in the mean count of car theft cases after the action plan’s introduction, as evidenced by both Poisson and Quasi-Poisson regression models. This decline is further supported by the observed decrease in monthly crime counts after 2024, with an average reduction of 100 cases per month. These findings highlight the potential effectiveness of government-led initiatives in curbing auto theft, although additional time is needed to assess the plan’s long-term impact comprehensively.
 
-## Second discussion point
+## Spatial and Temporal Patterns of Car Theft {#sec-second-point}
 
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+The spatial analysis revealed substantial variation in car theft occurrences across police divisions. Division 32 consistently exhibited the highest risk of car theft, while Divisions 11, 12, 13, and 54 reported the lowest counts. These patterns may reflect underlying differences in socioeconomic conditions, policing strategies, or community vigilance within these divisions. Additionally, the analysis of premise types indicated that thefts occurred most frequently in outdoor locations, suggesting that vehicle owners parking outside face higher risks. Temporal trends revealed spikes in crime during certain years, notably 2019 and 2022–2023, followed by a decline in 2024. Interestingly, car thefts were most common at the beginning of the month, possibly linked to behavioral or logistical patterns among offenders.
 
-## Third discussion point
+## Effectiveness of the National Action Plan {#sec-third-point}
 
-## Weaknesses and next steps
+While the National Action Plan appears to have contributed to a decline in car theft cases, its effectiveness likely varies by division and offense type. The reduction in "Theft From Motor Vehicle Under" cases aligns with the broader trend but raises questions about whether certain measures disproportionately target less severe crimes. Furthermore, the use of enhanced technologies and intelligence sharing could be more impactful in divisions with historically higher crime rates, such as Division 32. These findings underscore the importance of tailoring interventions to the specific needs and challenges of different regions.
 
-Weaknesses and next steps should also be included.
+## Weaknesses and Limitations
+
+This study has several limitations. First, the data used were limited to reported cases, potentially underestimating the true extent of car theft due to unreported incidents. Second, the overdispersion identified in the Poisson model suggests variability that may not have been fully captured by the predictors included in our analysis. Although the Quasi-Poisson model provided more appropriate standard error estimates, additional covariates, such as socioeconomic factors or policing intensity, could further improve model accuracy. Lastly, the relatively short timeframe since the National Action Plan’s implementation restricts our ability to evaluate its sustained effects.
+
+## Recommendations and Future Work
+
+Based on the findings, we recommend that policymakers focus on areas with persistently high car theft rates, such as Division 32, to deploy targeted interventions. Efforts to improve public awareness of high-risk premise types, such as outdoor parking, could also reduce theft occurrences. Further research should explore the role of socioeconomic and environmental factors in shaping car theft trends, leveraging longer-term data to evaluate the sustained effectiveness of the National Action Plan. Additionally, integrating machine learning approaches could enhance predictive modeling and offer more granular insights into crime dynamics.
 
 \newpage
 
@@ -306,28 +620,13 @@ Weaknesses and next steps should also be included.
 # Appendix {-}
 
 
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-## Diagnostics
-
-
-\newpage
-
-# Appendix {#sec-appendix .unnumbered}
-
 **Data Cleaning Steps**
 
 Raw data from Open Data Toronto were prepared, so we did not need to perform many cleaning steps. A few cleaning steps are as follows:
 
-- Recode missing values for genders other than male or female.
-- Standardize column names.
-- After realizing that there were too many missing values for other genders (over 90%), we dropped that variable.
-- Create a new Time variable to represent the first day of each recorded month in date format.
-
+- Only variables of interest were kept.
+- All records with all types of missing were excluded.
+- Only record indicating car theft cases occurrence after 2014 were kept.
 
 \newpage
 
