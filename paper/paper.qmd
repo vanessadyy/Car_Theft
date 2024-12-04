@@ -24,6 +24,7 @@ chunk_output_type: console
 #| include: false
 #| warning: false
 #| message: false
+
 library(tidyverse)
 library(here)
 library(lubridate)
@@ -135,7 +136,7 @@ variable_description <- data.frame(
   )
 )
 # Render the table
-kable(variable_description, col.names = c("Column", "Description")) %>% kable_styling(full_width = FALSE) %>%  column_spec(1, width = "4cm") %>% column_spec(2, width = "8cm")
+kable(variable_description, col.names = c("Column", "Description"), format = "latex") %>% kable_styling(full_width = FALSE) %>%  column_spec(1, width = "4cm") %>% column_spec(2, width = "8cm")
 ```
 
 ## Data Notes
@@ -203,9 +204,9 @@ Data cleaning steps are described in the [Appendix](#sec-appendix). A sample set
 
 i_am("README.md")
 dt <- read_csv(here("data","analysis_data","analysis_data.csv"))
-data_part1 <- kable(head(dt)[, 1:6],caption = "Sample of Clean Data: Part 1")
-data_part2 <- kable(head(dt)[, 7:10],caption = "Sample of Clean Data: Part 2")
-data_part3 <- kable(head(dt)[, 11:13],caption = "Sample of Clean Data: Part 3")
+data_part1 <- kable(head(dt)[, 1:6],caption = "Sample of Clean Data: Part 1", format = "latex")
+data_part2 <- kable(head(dt)[, 7:10],caption = "Sample of Clean Data: Part 2", format = "latex")
+data_part3 <- kable(head(dt)[, 11:13],caption = "Sample of Clean Data: Part 3", format = "latex")
 data_part1
 data_part2
 data_part3
@@ -424,7 +425,7 @@ poisson_model_all <- glm(
   family = poisson(link = "log"),
   data = monthly_counts_all
 )
-kable(summary(poisson_model_all)$coefficients)
+kable(summary(poisson_model_all)$coefficients, format = "latex")
 ```
 
 ### Prediction
@@ -467,7 +468,7 @@ The dispersion factor from @tbl-Poisson-dispersion is 14.74, indicating signific
 #| tbl-cap: "Poisson regression dispersion factor"
 
 dispersion_stat <- sum(residuals(poisson_model_all, type = "pearson")^2) / poisson_model_all$df.residual
-kable(data.frame(Stats="Dispersion Factor",Value=dispersion_stat))
+kable(data.frame(Stats="Dispersion Factor",Value=dispersion_stat), format = "latex")
 ```
 
 ```{r}
@@ -503,7 +504,7 @@ poisson_model_all2 <- glm(Crime_Count ~ time +action,
                           family = quasipoisson(),
                           data = monthly_counts_all)
 
-kable(summary(poisson_model_all2)$coefficients)
+kable(summary(poisson_model_all2)$coefficients, format = "latex")
 ```
 
 ```{r}
@@ -516,7 +517,7 @@ t1 <- as.data.frame(confint(poisson_model_all))
 t2 <- as.data.frame(confint(poisson_model_all2))
 t1$model_type <- "Poisson Model"
 t2$model_type <- "Quasi-Poisson Model"
-kable(rbind(t1,t2))
+kable(rbind(t1,t2), format = "latex")
 ```
 
 
@@ -541,7 +542,7 @@ poisson_model_PREMISES_TYPE <- glm(
   family = quasipoisson(),
   data = monthly_counts_PREMISES_TYPE
 )
-kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients, format = "latex")
 ```
 
 ```{r}
@@ -563,7 +564,7 @@ poisson_model_OFFENCE <- glm(
   family = quasipoisson(),
   data = monthly_counts_OFFENCE
 )
-kable(summary(poisson_model_OFFENCE)$coefficients)
+kable(summary(poisson_model_OFFENCE)$coefficients, format = "latex")
 ```
 
 ```{r}
@@ -585,7 +586,7 @@ poisson_model_DIVISION <- glm(
   family = quasipoisson(),
   data = monthly_counts_DIVISION
 )
-kable(summary(poisson_model_DIVISION)$coefficients)
+kable(summary(poisson_model_DIVISION)$coefficients, format = "latex")
 ```
 
 @tbl-Q-P-PREMISES_TYPE, @tbl-Q-P-OFFENCE, and @tbl-Q-P-DIVISION present point estimates from models incorporating different covariates. The results indicate that parking outside significantly increases the risk of car theft occurrences. Additionally, theft categorized as "Theft From Motor Vehicle Under" was associated with a higher number of car theft cases. Among the divisions, Division 32 exhibited the highest risk of car theft occurrence.
