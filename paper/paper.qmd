@@ -24,7 +24,6 @@ chunk_output_type: console
 #| include: false
 #| warning: false
 #| message: false
-
 library(tidyverse)
 library(here)
 library(lubridate)
@@ -45,15 +44,15 @@ library(janitor)
 
 # Introduction
 
-Vehicle theft has become a widespread public concern in Canada, leaving many citizens feeling helpless and frustrated. As car theft incidents continue to rise, police chiefs have made surprising recommendations, including advising residents to leave their car keys near the door to avoid violent confrontations during break-ins. This suggestion sparked public outrage, with many criticizing it online as absurd and unreasonable. The widespread public discourse escalated the issue into a national battle against crime.
+Vehicle theft has become a widespread public concern in Canada, leaving many citizens feeling helpless and frustrated. As car theft incidents continue to rise, police chiefs have made surprising recommendations, including advising residents to leave their car keys near the door to avoid violent confrontations during break-ins @citynews2024. This suggestion sparked public outrage, with many criticizing it online as absurd and unreasonable @globalnews2024. The widespread public discourse escalated the issue into a national battle against crime.
 
 ## The Scale of the Problem
 
-The scale of vehicle theft in Canada is alarming, exposing government inefficiency in tackling the problem. The reaction from law enforcement has been equally unexpected, with officers treating theft as an inevitable occurrence and even providing rationales for its prevalence. While insurance companies offer quick resolutions for stolen vehicle claims, this comes at a cost. Insurers are not charitable organizations, and frequent claims could lead to higher premiums or even the loss of insurance eligibility for some car owners. The reliance on insurance as a remedy highlights the authorities' decision to abandon pursuit of stolen vehicles, shifting the burden onto vehicle owners to seek reimbursement.
+The scale of vehicle theft in Canada is alarming, exposing government inefficiency in tackling the problem. In 2023, the number of motor vehicle thefts in Canada increased by 8.44% compared to the previous year, totaling 114,863 incidents @statista2024. The reaction from law enforcement has been equally unexpected, with officers treating theft as an inevitable occurrence and even providing rationales for its prevalence. While insurance companies offer quick resolutions for stolen vehicle claims, this comes at a cost @ibc2024. Insurers are not charitable organizations, and frequent claims could lead to higher premiums or even the loss of insurance eligibility for some car owners. The reliance on insurance as a remedy highlights the authorities' decision to abandon pursuit of stolen vehicles, shifting the burden onto vehicle owners to seek reimbursement.
 
 ## The Vicious Cycle of Vehicle Theft
 
-The indifferent attitude of law enforcement, coupled with lenient legal consequences, has fueled an annual increase in car thefts, pushing Canada into a vicious cycle of buying and stealing vehicles. The legal responsibilities surrounding car theft and the evasive accountability of international import companies reflect the complexities of organized crime. A large portion of stolen vehicles ends up in the Middle East and Africa, particularly Nigeria, where demand for high-quality second-hand cars is strong. The COVID-19 pandemic and geopolitical conflicts have exacerbated supply shortages, causing car prices in the Middle East to surge and further incentivizing theft.
+The indifferent attitude of law enforcement, coupled with lenient legal consequences, has fueled an annual increase in car thefts, pushing Canada into a vicious cycle of buying and stealing vehicles. The legal responsibilities surrounding car theft and the evasive accountability of international import companies reflect the complexities of organized crime @cbc2024. A large portion of stolen vehicles ends up in the Middle East and Africa, particularly Nigeria, where demand for high-quality second-hand cars is strong. The COVID-19 pandemic and geopolitical conflicts have exacerbated supply shortages, causing car prices in the Middle East to surge and further incentivizing theft.
 
 ## The Global Supply Chain of Stolen Vehicles
 
@@ -65,7 +64,7 @@ Faced with insufficient responses from the police, many vehicle owners have begu
 
 ## The National Action Plan
 
-Under pressure from the public and media, the Canadian government introduced a series of policies in early 2024 as part of a “National Action Plan” to combat auto theft. The key components of the plan include:
+Under pressure from the public and media, the Canadian government introduced a series of policies in early 2024 as part of a “National Action Plan” to combat auto theft @canadagov2024. The key components of the plan include:
 
 - **Amendments to Criminal Laws**: Revising legislation to provide law enforcement and prosecutors with enhanced tools to tackle vehicle theft.
 - **Changes to the Radiocommunication Act**: Tightening regulations on radio devices commonly used in car thefts.
