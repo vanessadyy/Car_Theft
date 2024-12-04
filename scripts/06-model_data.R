@@ -27,51 +27,50 @@ monthly_counts_all <- read_csv("./data/analysis_data/monthly_counts_all.csv")
 #read previous model#
 poisson_model_all <- readRDS(  file = "./models/first_model.rds"
 )
+#### Quasi-Likelihood Poisson Regression ####
+# Fit a Quasi-Poisson regression model to account for overdispersion
+poisson_model_all2 <- glm(
+  Crime_Count ~ time + action, # Model crime count as a function of time and action
+  family = quasipoisson(), # Use Quasi-Poisson family to handle overdispersion
+  data = monthly_counts_all # Use the processed dataset
+)
 
-####quasi-likelihood poisson regression####
-poisson_model_all2 <- glm(Crime_Count ~ time +action,
-                          family = quasipoisson(),
-                          data = monthly_counts_all)
+# Display the model's coefficients and confidence intervals
+kable(summary(poisson_model_all2)$coefficients) # Show regression coefficients
+kable(confint(poisson_model_all2)) # Show confidence intervals for the coefficients
 
-kable(summary(poisson_model_all2)$coefficients)
-kable(confint(poisson_model_all2))
-
-
-
-###prediction###
+### Prediction ###
+# Add predicted counts from the Quasi-Poisson model to the dataset
 monthly_counts_all <- monthly_counts_all %>%
   mutate(
-    Predicted_Count2 = predict(poisson_model_all2, type = "response")
+    Predicted_Count2 = predict(poisson_model_all2, type = "response") # Predict crime counts
   )
 
-
-
-##### Plot actual vs. predicted counts####
-
+##### Plot Actual vs. Predicted Counts ####
+# Visualize the actual and predicted crime counts over time using the Quasi-Poisson model
 ggplot(monthly_counts_all, aes(x = as.Date(time))) +
   geom_line(aes(y = Crime_Count, color = "Actual", linetype = "Actual"), size = 1) + # Actual counts
   geom_line(aes(y = Predicted_Count2, color = "Predicted", linetype = "Predicted"), size = 1) + # Predicted counts
-  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) + # Define line colors
-  scale_linetype_manual(values = c("Actual" = "solid", "Predicted" = "dashed")) + # Define line types
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) + # Set line colors
+  scale_linetype_manual(values = c("Actual" = "solid", "Predicted" = "dashed")) + # Set line types
   labs(
-    title = "Time Trends of Car Theft Crime Counts in Toronto",
-    x = "Time",
-    y = "Car Theft Crime Count",
+    title = "Time Trends of Car Theft Crime Counts in Toronto", # Chart title
+    x = "Time", # X-axis label
+    y = "Car Theft Crime Count", # Y-axis label
     color = "Type", # Legend title for color
     linetype = "Type" # Legend title for linetype
   ) +
   theme_minimal() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") # Position the legend on the right
 
-# diagnostics
-par(mfrow = c(2, 2)) # Set up plotting space
-plot(poisson_model_all2)
+# Diagnostics
+# Generate diagnostic plots for the Quasi-Poisson model
+par(mfrow = c(2, 2)) # Arrange plotting space for four diagnostic plots
+plot(poisson_model_all2) # Create diagnostic plots for residuals, leverage, and QQ
 
-
-#### Save model ####
+#### Save Model ####
+# Save the fitted Quasi-Poisson regression model to an RDS file for future use
 saveRDS(
-  poisson_model_all2,
-  file = "./models/second_model.rds"
+  poisson_model_all2, # The fitted Quasi-Poisson regression model
+  file = "./models/second_model.rds" # File path for saving the model
 )
-
-

@@ -14,25 +14,26 @@ library(tidyverse)
 library(rstudioapi)
 
 #### Download data ####
-# get package
+# Retrieve metadata for the specified dataset using its unique package ID
 package <- show_package("1fc65d1e-7dae-4766-98dd-3b172e40a089")
-package
+package  # View metadata to confirm the package details
 
-# get all resources for this package
+# Get all resources associated with the package
 resources <- list_package_resources("1fc65d1e-7dae-4766-98dd-3b172e40a089")
 
-# identify datastore resources; by default, Toronto Open Data sets datastore resource format to CSV for non-geospatial and GeoJSON for geospatial resources
-# here I used csv format data
+# Filter resources to identify only those in CSV format, which are typically non-geospatial data
+# "datastore_resources" will hold only the CSV data resources from the package
 datastore_resources <- filter(resources, tolower(format) %in% c('csv'))
 
-
-# load the first datastore resource as a sample
-data <- filter(datastore_resources, row_number()==1) %>% get_resource()
-data
-
+# Load the first resource from the datastore as an example or sample dataset
+# "data" will contain the actual data from the first resource in CSV format
+data <- filter(datastore_resources, row_number() == 1) %>% get_resource()
+data  # View the loaded dataset to verify the structure and content
 
 #### Save data ####
-# change the_raw_data to whatever name you assigned when you downloaded it.
+# Set the working directory dynamically to the parent folder of the current script
 fd <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/../")  
 setwd(fd)
-write_csv(data, "./data/raw_data/raw_data.csv") 
+
+# Save the loaded dataset to a local directory in CSV format
+write_csv(data, "./data/raw_data/raw_data.csv")
