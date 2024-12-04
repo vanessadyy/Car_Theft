@@ -21,5 +21,5 @@ The repo is structured as:
 ## Statement on LLM usage
 
 Aspects of the code were written with the help of the auto-complete tool, ChatGPT. 
-I also used ChatGPT for simple debuging and annotation my R scripts.
+I also used ChatGPT for simple debugging and annotating my R scripts.
 The entire chat history is available in other/llm_usage/usage.txt.
