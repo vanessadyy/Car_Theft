@@ -1,12 +1,12 @@
 ---
-title: "Canada’s Battle Against Car Theft: Progress Amid Persistent Challenges "
-subtitle: "Government measures and public vigilance show promise, but organized theft networks remain a concern."
+title: "Fight Against Car Theft: Progress and Challenges"
+subtitle: "A Data-Driven Review of the National Action Plan"
 author: 
   - Yiyue Deng
 thanks: "Code and data are available at: [https://github.com/vanessadyy/Car_Theft](https://github.com/vanessadyy/Car_Theft)."
 date: today
 date-format: long
-abstract: "Vehicle theft has become a significant public concern in Canada, highlighting both systemic challenges and promising governmental interventions. This study evaluates the effectiveness of the 2024 National Action Plan, which led to a 16.9% reduction in the mean monthly count of car thefts in Toronto. Spatial and temporal analyses reveal variations across police divisions and premise types, emphasizing the need for targeted strategies. Despite encouraging trends, organized theft networks and data limitations underscore the need for further research and adaptive policymaking."
+abstract: "Car theft remains a pressing public safety concern in Canada, prompting a national response through the 2024 National Action Plan. This study uses Toronto as a case example to evaluate the plan’s effectiveness, reporting a 16.93% reduction in the average monthly car theft count. Spatial and temporal analyses reveal notable disparities across areas covered by different police divisions and property types, highlighting the need for tailored local interventions. While the overall decline is encouraging, persistent challenges such as organized theft rings and data limitations underscore the necessity for continued research and adaptive policy development."
 include-before:
 - '\newpage'
 format:
@@ -14,10 +14,14 @@ format:
     toc: true
     toc-depth: 2
     number-sections: true
+    mainfont: Arial
+    sansfont: Arial
+    fig-pos: 'H'
 bibliography: references.bib
-csl: apa6.csl
+csl: nature.csl
 editor_options: 
 chunk_output_type: console
+
 ---
 
 ```{r}
@@ -45,51 +49,55 @@ library(janitor)
 
 # Introduction
 
-Vehicle theft has become a widespread public concern in Canada, leaving many citizens feeling helpless and frustrated. As car theft incidents continue to rise, police chiefs have made surprising recommendations, including advising residents to leave their car keys near the door to avoid violent confrontations during break-ins @citynews2024. This suggestion sparked public outrage, with many criticizing it online as absurd and unreasonable @globalnews2024. The widespread public discourse escalated the issue into a national battle against crime.
+Car theft has become a widespread public concern in Canada, leaving many citizens feeling helpless and frustrated. As car theft incidents continue to rise, police chiefs have made surprising recommendations, including advising residents to leave their car keys near the door to avoid violent confrontations during break-ins [@citynews2024]. This suggestion sparked public outrage, with many criticizing it online as absurd and unreasonable [@globalnews2024]. The widespread public discourse escalated the issue into a national battle against crime.
 
 ## The Scale of the Problem
 
-The scale of vehicle theft in Canada is alarming, exposing government inefficiency in tackling the problem. In 2023, the number of motor vehicle thefts in Canada increased by 8.44% compared to the previous year, totaling 114,863 incidents @statista2024. The reaction from law enforcement has been equally unexpected, with officers treating theft as an inevitable occurrence and even providing rationales for its prevalence. While insurance companies offer quick resolutions for stolen vehicle claims, this comes at a cost @ibc2024. Insurers are not charitable organizations, and frequent claims could lead to higher premiums or even the loss of insurance eligibility for some car owners. The reliance on insurance as a remedy highlights the authorities' decision to abandon pursuit of stolen vehicles, shifting the burden onto vehicle owners to seek reimbursement.
+The scale of car theft in Canada is alarming, exposing government inefficiency in tackling the problem. In 2023, the number of motor vehicle thefts in Canada increased by 8.44% compared to the previous year, totaling 114,863 incidents @statista2024. The reaction from law enforcement has been equally unexpected, with officers treating theft as an inevitable occurrence and even providing rationales for its prevalence. While insurance companies offer quick resolutions for stolen vehicle claims, this comes at a cost @ibc2024. Insurers are not charitable organizations, and frequent claims could lead to higher premiums or even the loss of insurance eligibility for some car owners. The reliance on insurance as a remedy highlights the authorities' decision to abandon pursuit of stolen vehicles, shifting the burden onto vehicle owners to seek reimbursement.
 
-## The Vicious Cycle of Vehicle Theft
+## Global Demand
 
-The indifferent attitude of law enforcement, coupled with lenient legal consequences, has fueled an annual increase in car thefts, pushing Canada into a vicious cycle of buying and stealing vehicles. The legal responsibilities surrounding car theft and the evasive accountability of international import companies reflect the complexities of organized crime @cbc2024. A large portion of stolen vehicles ends up in the Middle East and Africa, particularly Nigeria, where demand for high-quality second-hand cars is strong. The COVID-19 pandemic and geopolitical conflicts have exacerbated supply shortages, causing car prices in the Middle East to surge and further incentivizing theft.
+The indifferent attitude of law enforcement, coupled with lenient legal consequences, has fueled an annual increase in car thefts, pushing Canada into a vicious cycle of buying and stealing vehicles. The legal responsibilities surrounding car theft and the evasive accountability of international import companies reflect the complexities of organized crime @cbc2024. A large portion of stolen vehicles ends up in the Middle East and Africa, particularly Nigeria, where demand for high-quality used cars is strong. The COVID-19 pandemic and geopolitical conflicts have exacerbated supply shortages, causing car prices in the Middle East to surge and further incentivizing theft.
 
-## The Global Supply Chain of Stolen Vehicles
+## International Supply Chain
 
-The vehicle theft industry operates as an international supply chain, where cars of varying quality are allocated to different markets, creating a clear hierarchy. High-value vehicles are often shipped to affluent buyers, while lower-tier models serve other regions. The organized and systematic nature of these operations underscores the challenges faced by Canadian authorities in addressing this growing issue. Without comprehensive legal reforms and stricter enforcement measures, the country risks further entrenchment in this illicit cycle, with profound economic and social consequences.
+The car theft industry functions as a global supply chain, allocating vehicles of varying quality to different markets, forming a clear hierarchy. High-value cars are often shipped to wealthy buyers, while lower-tier models are directed to less affluent regions. Locally stolen vehicles are transported to seaports, illegally smuggled through shipping containers, and delivered to buyers worldwide. The organized and systematic nature of these operations highlights the significant challenges Canadian authorities face in combating this escalating issue. Without comprehensive legal reforms and stricter enforcement measures, the country risks deeper entrenchment in this illicit cycle, leading to severe social repercussions.
 
-## Public Response and Anti-Theft Measures
+## Public Response
 
-Faced with insufficient responses from the police, many vehicle owners have begun implementing their own anti-theft measures. However, professional thieves often view these devices as minor obstacles, and even robust anti-theft systems have limitations. High installation costs and vulnerabilities in extreme weather conditions further undermine their effectiveness. Some individuals attempt to protect their vehicles by parking in neighborhoods with higher police presence or near police stations. However, such measures do not guarantee safety, as evidenced by reports of police chiefs’ vehicles being stolen in broad daylight. These incidents highlight the audacity of thieves and have led to online ridicule of police authorities for failing to practice basic precautions.
+Faced with inadequate police responses, many vehicle owners have resorted to implementing their own anti-theft measures. Advanced security devices and traditional home-installed wheel locks are commonly used to deter theft. However, professional thieves often see these measures as minor obstacles, and even the most advanced systems have limitations. High installation costs and reduced effectiveness in extreme weather further compromise their reliability. Some owners attempt to safeguard their vehicles by parking in areas with a higher police presence or near police stations. Yet, such strategies offer no guarantee, as evidenced by reports of police chiefs' cars being stolen @belanger2023. These incidents expose the boldness of car thieves and have sparked online criticism of law enforcement for failing to uphold basic security practices.
 
 ## The National Action Plan
 
 Under pressure from the public and media, the Canadian government introduced a series of policies in early 2024 as part of a “National Action Plan” to combat auto theft @canadagov2024. The key components of the plan include:
 
-- **Amendments to Criminal Laws**: Revising legislation to provide law enforcement and prosecutors with enhanced tools to tackle vehicle theft.
+- **Amendments to Criminal Laws**: Revising legislation to provide law enforcement and prosecutors with enhanced tools to tackle car theft.
 - **Changes to the Radiocommunication Act**: Tightening regulations on radio devices commonly used in car thefts.
 - **Enhanced Intelligence and Information Sharing**: Promoting better collaboration among municipal, provincial, federal, and international agencies.
 - **Technology Deployment**: Leveraging advanced technologies such as scanning systems, data analytics, and GPS tracking to enhance inspection efficiency, particularly at ports and rail terminals.
-- **Specialized Training**: Offering targeted training programs for law enforcement officers to improve their capacity to investigate vehicle theft cases.
+- **Specialized Training**: Offering targeted training programs for law enforcement officers to improve their capacity to investigate car theft cases.
 - **Intergovernmental Task Force**: Creating a National Vehicle Theft Task Force to enhance coordination among government bodies.
 - **Support for Anti-Theft Technology Development**: Encouraging innovation and wider adoption of commercial anti-theft technologies.
 
+## Role of Toronto
+
+Toronto plays a central role in Canada’s car theft crisis due to its large population, extensive vehicle ownership, and strategic location near major shipping ports. The city accounts for a significant percentage of national vehicle theft cases, driven by organized crime groups targeting both high-end and commonly used vehicles. Its proximity to international export routes facilitates the illegal shipping of stolen cars to overseas markets. Therefore, Toronto serves as an excellent case study for analyzing Canada’s car theft situation.
+
 ## Interim Result and Aim of the Paper
 
-Several months have passed since the plan's implementation. Open Data Toronto has published theft-from-motor-vehicle data for Toronto reported from January 2014 to September 2024. To assess interim results, we analyzed this dataset to evaluate the effectiveness of the government's actions. Our objective is to produce statistically objective conclusions that quantify the plan's impact.
+Several months have passed since the National Action Plan's implementation. Open Data Toronto has published theft-from-motor-vehicle data for Toronto reported from January 2014 to September 2024 @toronto_theft2024. To assess interim results, we analyzed this dataset to evaluate the effectiveness of the government's actions. Our objective is to produce statistically objective conclusions that quantify the plan's impact.
 
 ## Estimand
 
-The primary estimand of this study is the monthly reduction in mean counts of car theft cases in Toronto following the implementation of the National Action Plan. This is defined as the difference in the mean monthly car theft count before and after January 2024, when the plan starts. The estimand will be evaluated across all vehicle theft records reported in Toronto, stratified by key covariates. This analysis assumes that the observed trends are not confounded by unrelated temporal factors.
+The primary estimand of this study is the reduction in incidence of car theft cases in Toronto following the implementation of the National Action Plan. This is defined as the difference in the mean monthly car theft count before and after January 2024, when the plan starts. The estimand will be evaluated across all car theft records reported in Toronto, stratified by key covariates. This analysis assumes that the observed trends are not confounded by unrelated temporal factors.
 
 # Data {#sec-data}
 
-Since 2014, the Toronto Police Service has been collecting auto theft data in digital format. The data is updated and maintained quarterly, with public access provided via Open Data Toronto. This dataset includes approximate locations of car theft incidents, facilitating the analysis of geographic trends over time. The latest update, released on October 19, 2024, covers reported theft cases up to September 30, 2024.
+Since 2014, the Toronto Police Service has been collecting auto theft data in digital format. The data is updated and maintained quarterly, with public access provided via Open Data Toronto @toronto_theft2024. This dataset includes approximate locations of car theft incidents, facilitating the analysis of geographic trends over time. The latest update, released on October 19, 2024, covers reported theft cases up to September 30, 2024.
 
 ## Data Source
 
-The dataset used in this study was obtained from [Open Data Toronto](https://open.toronto.ca/dataset/deaths-of-shelter-residents/). The raw dataset comprises the following [key fields](@tbl-variable_description):
+The dataset used in this study was obtained from [Open Data Toronto](https://open.toronto.ca/dataset/theft-from-motor-vehicle/). The raw dataset comprises the key fields described in @tbl-variable_description:
 
 ```{r}
 #| label: tbl-variable_description
@@ -196,27 +204,25 @@ We used R 4.3 for analysis and followed a public template @citeR@citeRohan, and 
 
 ## Data Management
 
-Data cleaning steps are described in the [Appendix](#sec-appendix). A sample set of the cleaned data is presented in Table 2-4. Among all variables, Year, Total_Death, Male, and Female are coded as integers, Month is coded as abbreviations in character format, and Time is coded in date format. After data cleaning, there are no missing values remaining in the dataset.
+Data cleaning steps are described in the [Appendix](#sec-appendix). A sample set of the cleaned data of first few variables is presented in @tbl-sample_data. Among all variables, Year, Total_Death, Male, and Female are coded as integers, Month is coded as abbreviations in character format, and Time is coded in date format. After data cleaning, there are no missing values remaining in the dataset.
 
-```{r}
+```{r sampledata}
 #| echo: false
 #| warning: false
+#| label: tbl-sample_data
+#| tbl-cap: "Sample of Clean Data"
 
 i_am("README.md")
 dt <- read_csv(here("data","analysis_data","analysis_data.csv"))
-data_part1 <- kable(head(dt)[, 1:6],caption = "Sample of Clean Data: Part 1", format = "latex")
-data_part2 <- kable(head(dt)[, 7:10],caption = "Sample of Clean Data: Part 2", format = "latex")
-data_part3 <- kable(head(dt)[, 11:13],caption = "Sample of Clean Data: Part 3", format = "latex")
+data_part1 <- kable(head(dt)[, 1:6])
 data_part1
-data_part2
-data_part3
 ```
 
 # Methods {#sec-methods}
 
 ## Poisson Regression
 
-The Poisson distribution is utilized to model the monthly count of car thefts, with a binary variable "action" serving as an indicator of whether the time of theft occurrence falls after the implementation of the national action plan. The following are the formulas for the Poisson regression model:
+The Poisson distribution is utilized to model the monthly count of car thefts, with a binary variable "action" serving as an indicator of whether the time of theft occurrence falls after the implementation of the National Action Plan. The following are the formulas for the Poisson regression model:
 
 $$
 y_i \sim \text{Poisson}(\lambda_i)
@@ -225,13 +231,13 @@ $$
 $$
 \log(\lambda_i) = \beta_0 + \beta_1 \cdot \text{time} + \beta_2 \cdot \text{action} + \cdots + \beta_k \cdot \text{covariate}_k
 $$
-where y_i is the count of car theft occurance.
+where $\lambda_i$ is the expectation of count of car theft occurrence, $\beta_0$ is the intercept, $\beta_i$ is the corresponding coefficient for a predictor.
 
 We ran a generalized linear model with a log link function, ensuring that all of the predicted values will be positive, and using a Poisson error distribution.
 
 ## Quasi-likelihood Poisson Regression
 
-To address the potential for overdispersion, we also performed a quasi-likelihood Poisson regression. This approach uses the same mean function as standard Poisson regression but estimates parameters using quasi-maximum likelihood estimation or generalized estimating equations, with adjustments for an estimated dispersion parameter. We compared the results from Poisson and Quasi-Poisson regression models, selecting the more suitable model based on a comprehensive diagnostic evaluation. This assessment included checks for overdispersion, identification of outliers, and analysis of residual distribution. Further details are provided in the [results section]{@sec-results}.
+To address the potential for overdispersion, we also performed a quasi-likelihood Poisson regression. This approach uses the same mean function as standard Poisson regression but estimates parameters using quasi-maximum likelihood estimation or generalized estimating equations, with adjustments for an estimated dispersion parameter. We compared the results from Poisson and Quasi-Poisson regression models, selecting the more suitable model based on a comprehensive diagnostic evaluation. This assessment included checks for overdispersion, identification of outliers, and analysis of residual distribution. Further details are provided in @sec-results.
 
 # Results {#sec-results}
 
@@ -272,11 +278,13 @@ Before running the model, we firstly draw a few figures and tables as descriptiv
 
 ### Spatial View
 
+@fig-Spatial-View illustrates the spatial distribution of car theft occurrences in September 2024 across police divisions. @fig-division-chart displays the overall count of car theft cases by division. Notably, Division D54 reported the lowest number of car theft cases, with Divisions D11 to D13 also showing relatively low counts, while Division D32 recorded the highest.
+
 ```{r}
 #| label: fig-Spatial-View
 #| echo: false
 #| warning: false
-#| fig-cap: "Spatial view of vehicle theft cases by division for September 2024"
+#| fig-cap: "Spatial view of car theft cases by division for September 2024"
 
 division_sf <- st_as_sf(dt %>% filter(OCC_YEAR==2024, OCC_MONTH=="September"), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
   group_by(DIVISION) %>%
@@ -288,8 +296,6 @@ ggplot(data = division_sf) +
   labs( x = "Longitude", y = "Latitude") +
   theme_minimal()
 ```
-
-@fig-Spatial-View illustrates the spatial distribution of car theft occurrences in September 2024 across police divisions. @fig-division-chart displays the overall count of car theft cases by division. Notably, Division D54 reported the lowest number of car theft cases, with Divisions D11 to D13 also showing relatively low counts, while Division D33 recorded the highest. Further analysis is needed, considering additional information about public safety conditions within these division areas.
 
 ```{r}
 #| label: fig-division-chart
@@ -309,7 +315,7 @@ ggplot(dt, aes(x = DIVISION)) +
 
 ### Premise Types
 
-@fig-premises-chart reveals that car theft cases occurred most frequently outside, followed by educational institutions, while transit locations reported the fewest cases. Across all premise types, two periods of increase were observed in 2019 and 2022-2023, with a decline noted after 2024.
+@fig-premises-chart reveals that car theft cases occurred most frequently outside, followed by houses, while transit locations reported the fewest cases. Across all premise types, two periods of increase were observed in 2019 and 2022-2023, with a decline noted after 2024.
 
 ```{r}
 #| label: fig-premises-chart
@@ -335,7 +341,7 @@ ggplot(df_table, aes(x = OCC_YEAR, y = Count, color = PREMISES_TYPE, group = PRE
 
 ### Offence Types
 
-@fig-offence-chart shows that most car theft cases were categorized as "Theft From Motor Vehicle Under," involving financial losses of less than $5,000. The number of severe cases remained relatively stable over the years, while lighter cases experienced two increases in 2019 and 2022, with declines observed in 2016 and after 2024.
+@fig-offence-chart shows that most car theft cases were categorized as "Theft From Motor Vehicle Under", involving financial losses of less than $5,000. The number of severe cases remained relatively stable over the years, while lighter cases experienced two increases in 2019 and 2022, with declines observed in 2016, 2021 and after 2024.
 
 ```{r}
 #| label: fig-offence-chart
@@ -361,7 +367,7 @@ ggplot(df_offence, aes(x = OCC_YEAR, y = Count, color = OFFENCE, group = OFFENCE
 
 ### Day of the Week
 
-@fig-dow-chart indicates that car theft crimes were distributed relatively evenly across all days of the week, with a slight increase observed on Fridays.
+@fig-dow-chart indicates that car theft crimes were distributed evenly across all days of the week, with a slight increase observed on Fridays.
 
 ```{r}
 #| label: fig-dow-chart
@@ -381,13 +387,14 @@ ggplot(dt, aes(x = OCC_DOW)) +
 
 ### Day of the Month
 
-Interestingly, @fig-day-chart reveals that car theft cases occurred most frequently on the first day of the month and least often at the end of the month. The difference could be as high as 1,000 cases over a 10-year period, equivalent to approximately 30%.
+Interestingly, @fig-day-chart reveals that car theft cases occurred most frequently on the first day of the month and least often at the end of the month. The difference could be as big as 1,000 cases over a 10-year period, equivalent to approximately 30%.
 
 ```{r}
 #| label: fig-day-chart
 #| echo: false
 #| warning: false
 #| fig-cap: "Barchart of count of occurrences by day of the month"
+
 
 ggplot(dt, aes(x = OCC_DAY)) +
   geom_bar(fill = "steelblue", color = "black") +
@@ -403,13 +410,14 @@ ggplot(dt, aes(x = OCC_DAY)) +
 
 ### Point Estimates
 
-@tbl-Poisson indicates that the variable "action" had a significant effect on the mean count of car theft cases. Specifically, after the implementation of the national action plan, there was an approximate 1−exp(−0.185)=1−0.831=16.9% reduction in the mean count of car theft cases. This result highlights the potential effectiveness of the action plan in mitigating car theft, suggesting a notable decrease in incidents following its introduction.
+@tbl-Poisson indicates that the variable "action", indicator of implimentation of National Action Plan, had a significant effect on the mean count of car theft cases. Specifically, after the implementation of the National Action Plan, there was an approximate $$1-exp(-0.1855)=1-0.8307=16.93\% $$ reduction in the mean count of car theft cases. This result highlights the potential effectiveness of the action plan in mitigating car theft, suggesting a notable decrease in incidents following its introduction.
 
 ```{r}
 #| label: tbl-Poisson
 #| echo: false
 #| warning: false
 #| tbl-cap: "Poisson regression results"
+#| tbl-pos: 'H'
 
 monthly_counts_all <- dt %>%
   mutate(
@@ -425,12 +433,12 @@ poisson_model_all <- glm(
   family = poisson(link = "log"),
   data = monthly_counts_all
 )
-kable(summary(poisson_model_all)$coefficients, format = "latex")
+kable(round(summary(poisson_model_all)$coefficients,4), format = "latex")
 ```
 
 ### Prediction
 
-Predictions from the model in @fig-Poisson-pred demonstrate a significant difference in the expected monthly car theft counts, with post-2024 counts being approximately 100 cases lower per month on average. This reduction suggests a measurable impact of national action plan starting in 2024.
+Predictions from the model in @fig-Poisson-pred demonstrate a significant difference in the expected monthly car theft counts, with post-2024 counts being approximately 100 cases lower per month on average. This reduction suggests a measurable impact of National Action Plan starting in 2024.
 
 ```{r}
 #| label: fig-Poisson-pred
@@ -459,7 +467,7 @@ ggplot(monthly_counts_all, aes(x = as.Date(time))) +
 
 ### Model Diagnosis
 
-The dispersion factor from @tbl-Poisson-dispersion is 14.74, indicating significant overdispersion in the data. The rootogram in @fig-Poisson-rootogram reveals overfitting for crime counts in the range of 700–800 and underfitting for other ranges. Diagnostic plots in @fig-Poisson-diagnosis show no major deflation in the QQ plot, suggesting a normal distribution of residuals. Leverage plots indicate only three significant outliers, corresponding to observations 5, 26, and 122.
+The dispersion factor from @tbl-Poisson-dispersion is 14.74, indicating significant overdispersion in the data. The rootogram in @fig-Poisson-rootogram reveals overfitting for crime counts in the range of 700–800 and underfitting for other ranges. Diagnostic plots in @fig-Poisson-diagnosis show no major deflation in the QQ plot, suggesting a normal distribution of residuals. Leverage plots indicate only one influential point, corresponding to observation 122.
 
 ```{r}
 #| label: tbl-Poisson-dispersion
@@ -468,7 +476,7 @@ The dispersion factor from @tbl-Poisson-dispersion is 14.74, indicating signific
 #| tbl-cap: "Poisson regression dispersion factor"
 
 dispersion_stat <- sum(residuals(poisson_model_all, type = "pearson")^2) / poisson_model_all$df.residual
-kable(data.frame(Stats="Dispersion Factor",Value=dispersion_stat), format = "latex")
+kable(data.frame(Stats="Dispersion Factor",Value=round(dispersion_stat,4)), format = "latex")
 ```
 
 ```{r}
@@ -485,6 +493,8 @@ rootogram(poisson_model_all)
 #| echo: false
 #| warning: false
 #| fig-cap: "Poisson regression model diagnosis"
+#| fig.width: 8
+#| fig.height: 12
 
 par(mfrow = c(2, 2)) 
 plot(poisson_model_all)
@@ -492,19 +502,20 @@ plot(poisson_model_all)
 
 ## Quasi-Poisson Model
 
-@tbl-Q-Poisson shows that the Quasi-Poisson model produced the same point estimate for the effect of "action," indicating a 16.9% reduction in the mean count of car theft cases following the implementation of the national action plan. However, the Quasi-Poisson model estimated a larger standard error, resulting in narrower confidence intervals (see @tbl-Q-Poisson), which may provide a more reliable and appropriate measure of precision.
+@tbl-Q-Poisson shows that the Quasi-Poisson model produced the same point estimate for the effect of "action", indicating a 16.93% reduction in the mean count of car theft cases following the implementation of the National Action Plan. However, the Quasi-Poisson model estimated a larger standard error, resulting in narrower confidence intervals (see @tbl-Q-P-CI), which provides a more reliable and appropriate measure of precision.
 
 ```{r}
 #| label: tbl-Q-Poisson
 #| echo: false
 #| warning: false
 #| tbl-cap: "Quasi-likelihood Poisson regression results"
+#| tbl-pos: 'H'
 
 poisson_model_all2 <- glm(Crime_Count ~ time +action,
                           family = quasipoisson(),
                           data = monthly_counts_all)
 
-kable(summary(poisson_model_all2)$coefficients, format = "latex")
+kable(round(summary(poisson_model_all2)$coefficients,4), format = "latex")
 ```
 
 ```{r}
@@ -512,6 +523,7 @@ kable(summary(poisson_model_all2)$coefficients, format = "latex")
 #| echo: false
 #| warning: false
 #| tbl-cap: "Comparison between Quasi-likelihood Poisson and Poisson estimated confidence intervals"
+#| tbl-pos: 'H'
 
 t1 <- as.data.frame(confint(poisson_model_all))
 t2 <- as.data.frame(confint(poisson_model_all2))
@@ -523,11 +535,60 @@ kable(rbind(t1,t2), format = "latex")
 
 ## Model with covariates
 
+
+@tbl-appendix-Q-P-PREMISES_TYPE, @tbl-appendix-Q-P-OFFENCE, and @tbl-appendix-Q-P-DIVISION in [Appendix] present point estimates from models incorporating different covariates. The results indicate that parking outside significantly increases the risk of car theft occurrences. Additionally, theft categorized as "Theft From Motor Vehicle Under" was associated with a higher number of car theft cases. Among the divisions, Division 32 exhibited the highest risk of car theft occurrence.
+
+# Discussion
+
+## Summary of Findings
+
+### Impact of the National Action Plan {#sec-first-point}
+
+The implementation of the National Action Plan in early 2024 has led to a measurable reduction in car theft in Toronto. Our analysis indicates a 16.93% decline in the average monthly count of car theft cases after the plan’s introduction, as shown by both Poisson and Quasi-Poisson regression models. Monthly crime counts fell by approximately 100 cases per month following the policy's enactment. Compared with the Poisson regression model, the Quasi-Poisson model produced the same point estimate but provided a more precise confidence interval by addressing overdispersion. These findings underscore the potential of government-led initiatives in reducing auto theft, though long-term monitoring is needed to evaluate sustained effects.
+
+### Spatial and Temporal Patterns of Car Theft {#sec-second-point}
+
+Spatial analysis revealed notable differences in car theft rates across Toronto's police divisions. Division 32 consistently experienced the highest theft rates due to its urban environment, heavy traffic, and role as a commercial hub, making it an attractive target for criminals. In contrast, Division 54 reported the lowest theft rates, likely due to its suburban setting, lower population density, and reduced vehicular activity, enabling more effective policing. Outdoor parking areas had the highest theft frequencies, reflecting elevated risks for vehicles parked outside. Temporally, thefts peaked in 2019 and 2022-2023, with a decline after 2024. A temporary reduction in early 2021 was likely caused by decreased mobility and public activity due to the COVID-19 pandemic. Notably, car thefts were most frequent at the beginning of the month and dropped significantly toward the month’s end, warranting further investigation into this pattern.
+
+### Effectiveness of the National Action Plan {#sec-third-point}
+
+Although the National Action Plan appears to have reduced overall car theft cases, its effectiveness likely varies by division and offense type. The higher occurrence of "Theft From Motor Vehicle Under" cases may be linked to less expensive vehicles with weaker anti-theft features, making them more susceptible to theft. Similarly, thefts involving residential properties and outdoor parking areas underscore the need for targeted security enhancements in these settings. These findings highlight the importance of tailoring crime prevention strategies to address distinct regional challenges.
+
+## Weaknesses and Limitations
+
+This study has several limitations. First, the analysis relied on reported cases, potentially underestimating the true extent of car theft due to unreported incidents. Second, the overdispersion identified in the Poisson model indicates variability that may not have been fully captured by the included predictors. While the Quasi-Poisson model improved standard error estimates, incorporating additional covariates such as socioeconomic factors or policing intensity could enhance model accuracy. Interaction effects were not examined in this study. Lastly, the relatively short timeframe since the National Action Plan’s implementation limits the ability to assess its long-term effects.
+
+## Recommendations and Future Work
+
+Based on the findings, we recommend that policymakers focus on areas with persistently high car theft rates, such as Division 32, to deploy targeted interventions. Efforts to improve public awareness of high-risk premise types, such as outdoor parking, could also reduce theft occurrences. Further research should explore the role of socioeconomic and environmental factors in shaping car theft trends, leveraging longer-term data to evaluate the sustained effectiveness of the National Action Plan. Additionally, integrating machine learning approaches could enhance predictive modeling and offer more granular insights into crime dynamics.
+
+\newpage
+
+\appendix
+
+# Appendix {#sec-appendix}
+
+## Data Cleaning Steps 
+
+Raw data from Open Data Toronto were prepared, so we did not need to perform many cleaning steps. A few cleaning steps are as follows:
+
+- Only variables of interest were kept.
+- All records with all types of missing were excluded.
+- Only record indicating car theft cases occurrence after 2014 were kept.
+
+Details are described in a [script](https://github.com/vanessadyy/Car_Theft/blob/main/scripts/03-clean_data.R).
+\newpage
+
+## Additional Tables 
+
 ```{r}
-#| label: tbl-Q-P-PREMISES_TYPE
+#| label: tbl-appendix-Q-P-PREMISES_TYPE
 #| echo: false
 #| warning: false
 #| tbl-cap: "Quasi-likelihood Poisson regression with covariate of premise types"
+#| tbl-pos: 'H'
+
+
 monthly_counts_PREMISES_TYPE <- dt %>%
   mutate(
     YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
@@ -546,10 +607,12 @@ kable(summary(poisson_model_PREMISES_TYPE)$coefficients, format = "latex")
 ```
 
 ```{r}
-#| label: tbl-Q-P-OFFENCE
+#| label: tbl-appendix-Q-P-OFFENCE
 #| echo: false
 #| warning: false
 #| tbl-cap: "Quasi-likelihood Poisson regression with covariate of offence types"
+#| tbl-pos: 'H'
+
 monthly_counts_OFFENCE <- dt %>%
   mutate(
     YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
@@ -568,10 +631,12 @@ kable(summary(poisson_model_OFFENCE)$coefficients, format = "latex")
 ```
 
 ```{r}
-#| label: tbl-Q-P-DIVISION
+#| label: tbl-appendix-Q-P-DIVISION
 #| echo: false
 #| warning: false
 #| tbl-cap: "Quasi-likelihood Poisson regression with covariate of divisions"
+#| tbl-pos: 'H'
+
 monthly_counts_DIVISION <- dt %>%
   mutate(
     YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
@@ -589,47 +654,7 @@ poisson_model_DIVISION <- glm(
 kable(summary(poisson_model_DIVISION)$coefficients, format = "latex")
 ```
 
-@tbl-Q-P-PREMISES_TYPE, @tbl-Q-P-OFFENCE, and @tbl-Q-P-DIVISION present point estimates from models incorporating different covariates. The results indicate that parking outside significantly increases the risk of car theft occurrences. Additionally, theft categorized as "Theft From Motor Vehicle Under" was associated with a higher number of car theft cases. Among the divisions, Division 32 exhibited the highest risk of car theft occurrence.
-
-# Discussion
-
-## Impact of the National Action Plan {#sec-first-point}
-
-The results of this study indicate that the National Action Plan implemented in early 2024 has shown a measurable impact on reducing car theft in Toronto. Our analysis demonstrates a 16.9% reduction in the mean count of car theft cases after the action plan’s introduction, as evidenced by both Poisson and Quasi-Poisson regression models. This decline is further supported by the observed decrease in monthly crime counts after 2024, with an average reduction of 100 cases per month. These findings highlight the potential effectiveness of government-led initiatives in curbing auto theft, although additional time is needed to assess the plan’s long-term impact comprehensively.
-
-## Spatial and Temporal Patterns of Car Theft {#sec-second-point}
-
-The spatial analysis revealed substantial variation in car theft occurrences across police divisions. Division 32 consistently exhibited the highest risk of car theft, while Divisions 11, 12, 13, and 54 reported the lowest counts. These patterns may reflect underlying differences in socioeconomic conditions, policing strategies, or community vigilance within these divisions. Additionally, the analysis of premise types indicated that thefts occurred most frequently in outdoor locations, suggesting that vehicle owners parking outside face higher risks. Temporal trends revealed spikes in crime during certain years, notably 2019 and 2022–2023, followed by a decline in 2024. Interestingly, car thefts were most common at the beginning of the month, possibly linked to behavioral or logistical patterns among offenders.
-
-## Effectiveness of the National Action Plan {#sec-third-point}
-
-While the National Action Plan appears to have contributed to a decline in car theft cases, its effectiveness likely varies by division and offense type. The reduction in "Theft From Motor Vehicle Under" cases aligns with the broader trend but raises questions about whether certain measures disproportionately target less severe crimes. Furthermore, the use of enhanced technologies and intelligence sharing could be more impactful in divisions with historically higher crime rates, such as Division 32. These findings underscore the importance of tailoring interventions to the specific needs and challenges of different regions.
-
-## Weaknesses and Limitations
-
-This study has several limitations. First, the data used were limited to reported cases, potentially underestimating the true extent of car theft due to unreported incidents. Second, the overdispersion identified in the Poisson model suggests variability that may not have been fully captured by the predictors included in our analysis. Although the Quasi-Poisson model provided more appropriate standard error estimates, additional covariates, such as socioeconomic factors or policing intensity, could further improve model accuracy. Lastly, the relatively short timeframe since the National Action Plan’s implementation restricts our ability to evaluate its sustained effects.
-
-## Recommendations and Future Work
-
-Based on the findings, we recommend that policymakers focus on areas with persistently high car theft rates, such as Division 32, to deploy targeted interventions. Efforts to improve public awareness of high-risk premise types, such as outdoor parking, could also reduce theft occurrences. Further research should explore the role of socioeconomic and environmental factors in shaping car theft trends, leveraging longer-term data to evaluate the sustained effectiveness of the National Action Plan. Additionally, integrating machine learning approaches could enhance predictive modeling and offer more granular insights into crime dynamics.
-
 \newpage
-
-\appendix
-
-# Appendix {-}
-
-
-**Data Cleaning Steps**
-
-Raw data from Open Data Toronto were prepared, so we did not need to perform many cleaning steps. A few cleaning steps are as follows:
-
-- Only variables of interest were kept.
-- All records with all types of missing were excluded.
-- Only record indicating car theft cases occurrence after 2014 were kept.
-
-\newpage
-
 
 # References
 

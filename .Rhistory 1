@@ -1,0 +1,512 @@
+setwd(fd)
+analysis_data <- read_csv("./data/analysis_data/analysis_data.csv")
+monthly_counts_all <- read_csv("./data/analysis_data/monthly_counts_all.csv")
+#read previous model#
+poisson_model_all <- readRDS(  file = "./models/first_model.rds"
+)
+summary(poisson_model_all)
+####quasi-likelihood poisson regression####
+poisson_model_all2 <- glm(Crime_Count ~ time +action,
+family = quasipoisson(),
+data = monthly_counts_all)
+summary(poisson_model_all2)
+confint(poisson_model_all)
+confint(poisson_model_all2)
+###prediction###
+monthly_counts_all <- monthly_counts_all %>%
+mutate(
+Predicted_Count2 = predict(poisson_model_all2, type = "response")
+)
+ggplot(monthly_counts_all, aes(x = as.Date(time))) +
+geom_line(aes(y = Crime_Count, color = "Actual", linetype = "Actual"), size = 1) + # Actual counts
+geom_line(aes(y = Predicted_Count2, color = "Predicted", linetype = "Predicted"), size = 1) + # Predicted counts
+scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) + # Define line colors
+scale_linetype_manual(values = c("Actual" = "solid", "Predicted" = "dashed")) + # Define line types
+labs(
+title = "Time Trends of Car Theft Crime Counts in Toronto",
+x = "Time",
+y = "Car Theft Crime Count",
+color = "Type", # Legend title for color
+linetype = "Type" # Legend title for linetype
+) +
+theme_minimal() +
+theme(legend.position = "right")
+glance(poisson_model_all2) |> round(3)
+library(broom)
+glance(poisson_model_all2) |> round(3)
+glance(poisson_model_all) |> round(3)
+# diagnostics
+par(mfrow = c(2, 2)) # Set up plotting space
+plot(poisson_model_all2)
+#rootogram#
+rootogram(poisson_model_all2)
+#### Save model ####
+saveRDS(
+poisson_model_all2,
+file = "./models/second_model.rds"
+)
+#### Workspace setup ####
+library(rstudioapi)
+library(MASS)
+library(tidyverse)
+library(topmodels)
+#### Read data ####
+fd <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/../")
+setwd(fd)
+analysis_data <- read_csv("./data/analysis_data/analysis_data.csv")
+####quasi-likelihood poisson regression with premises type####
+monthly_counts_PREMISES_TYPE <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,PREMISES_TYPE) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+####quasi-likelihood poisson regression with premises type####
+monthly_counts_PREMISES_TYPE <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,PREMISES_TYPE) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+poisson_model_PREMISES_TYPE <- glm(
+Crime_Count ~ time+PREMISES_TYPE +action,
+family = quasipoisson(),
+data = monthly_counts_PREMISES_TYPE
+)
+summary(poisson_model_PREMISES_TYPE)
+confint(poisson_model_PREMISES_TYPE)
+glance(summary(poisson_model_PREMISES_TYPE))
+summary(poisson_model_PREMISES_TYPE)
+summary(poisson_model_PREMISES_TYPE)$coefficients
+glance(summary(poisson_model_PREMISES_TYPE)$coefficients)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+library(tidyverse)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+library(knitr)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients) %>% round(3)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients) |> round(3)
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+kable(confint(poisson_model_PREMISES_TYPE))
+summary(poisson_model_all)$coefficients
+kable(summary(poisson_model_all)$coefficients)
+kable(confint(poisson_model_all))
+kable(summary(poisson_model_all2)$coefficients)
+kable(confint(poisson_model_all2))
+kable(summary(poisson_model_PREMISES_TYPE)$coefficients)
+####quasi-likelihood poisson regression with premises type####
+monthly_counts_OFFENCE <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,OFFENCE) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01")))  ,
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+####quasi-likelihood poisson regression with offence type####
+monthly_counts_OFFENCE <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,OFFENCE) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01")))  ,
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+poisson_model_OFFENCE <- glm(
+Crime_Count ~ time+OFFENCE +action,
+family = quasipoisson(),
+data = monthly_counts_OFFENCE
+)
+kable(summary(poisson_model_OFFENCE)$coefficients)
+kable(confint(poisson_model_OFFENCE))
+####quasi-likelihood poisson regression with division number####
+monthly_counts_DIVISION <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,OFFENCE) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01")))  ,
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+poisson_model_DIVISION <- glm(
+Crime_Count ~ time+DIVISION +action,
+family = quasipoisson(),
+data = monthly_counts_DIVISION
+)
+####quasi-likelihood poisson regression with division number####
+monthly_counts_DIVISION <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEARMONTH,DIVISION) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01")))  ,
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+poisson_model_DIVISION <- glm(
+Crime_Count ~ time+DIVISION +action,
+family = quasipoisson(),
+data = monthly_counts_DIVISION
+)
+kable(summary(poisson_model_DIVISION)$coefficients)
+kable(confint(poisson_model_DIVISION))
+#### Save model ####
+saveRDS(
+poisson_model_PREMISES_TYPE,
+file = "./models/second_model_with_premisestype.rds"
+)
+saveRDS(
+poisson_model_OFFENCE,
+file = "./models/second_model_with_offence.rds"
+)
+saveRDS(
+poisson_model_DIVISION,
+file = "./models/second_model_with_division.rds"
+)
+#### Workspace setup ####
+library(rstudioapi)
+library(MASS)
+library(tidyverse)
+library(topmodels)
+library(knitr)
+#### Read data ####
+fd <- paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/../")
+setwd(fd)
+analysis_data <- read_csv("./data/analysis_data/analysis_data.csv")
+### monthly trend histogram###
+monthly_counts <- analysis_data %>%
+group_by(OCC_YEAR, OCC_MONTH) %>%
+summarise(Count = n(), .groups = 'drop') %>%
+mutate(Period = make_date(OCC_YEAR, OCC_MONTH, 1))
+ggplot(monthly_counts, aes(x = Period, y = Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+monthly_counts_all <- read_csv("./data/analysis_data/monthly_counts_all.csv")
+### monthly trend histogram###
+ggplot(monthly_counts_all, aes(x = time, y = Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### monthly trend histogram###
+ggplot(monthly_counts_all, aes(x = time, y = Count)) +
+geom_col(fill = "steelblue", color = "black") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### monthly trend histogram###
+ggplot(monthly_counts_all, aes(x = time, y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### monthly trend histogram###
+ggplot(monthly_counts_all, aes(x = as.Date(time), y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### yearly trend histogram###
+yearly_counts_all <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(OCC_YEAR) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+analysis_data <- read_csv("./data/analysis_data/analysis_data.csv")
+### yearly trend histogram###
+monthly_counts_all <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(YEAR) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+### yearly trend histogram###
+monthly_counts_all <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(OCC_YEAR) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(YEARMONTH, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+### yearly trend histogram###
+monthly_counts_all <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(OCC_YEAR) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(OCC_YEAR, "-01-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+### yearly trend histogram###
+yearly_counts_all <- analysis_data %>%
+mutate(
+YEARMONTH = format(OCC_DATE, "%Y-%m")  # Extract year and month in "YYYY-MM" format
+) %>%
+group_by(OCC_YEAR) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(OCC_YEAR, "-01-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")),1,0))
+ggplot(yearly_counts_all, aes(x = as.Date(time), y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(yearly_counts_all, aes(x = as.Date(time), y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+scale_x_date(date_labels = "%Y", date_breaks = "1 month") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(yearly_counts_all, aes(x = OCC_YEAR, y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+labs(
+title = "Histogram of monthly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### quarterly trend histogram###
+quarterly_counts <- analysis_data %>%
+mutate(
+YEARQUARTER = paste0(format(OCC_DATE, "%Y"), "-Q", ceiling(as.numeric(format(OCC_DATE, "%m")) / 3))  # Extract year and quarter
+) %>%
+group_by(YEARQUARTER) %>%
+summarise(Crime_Count = n(), .groups = "drop") %>%
+mutate(
+time = as.numeric(as.Date(paste0(substr(YEARQUARTER, 1, 4), "-", (as.numeric(substr(YEARQUARTER, 7, 7)) - 1) * 3 + 1, "-01"))),
+action = ifelse(time >= as.numeric(as.Date("2024-01-01")), 1, 0)
+)
+ggplot(quarterly_counts, aes(x = YEARQUARTER, y = Crime_Count)) +
+geom_col(fill = "steelblue", color = "black") +
+labs(
+title = "Histogram of quarterly Count of Car Theft Cases",
+x = "Month",
+y = "Number of Cases"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+install.packages("sf")
+install.packages("sf")
+library(sf)
+### sf plot ###
+division_sf <- st_as_sf(analysis_data, coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+ggplot(data = division_sf) +
+geom_sf(aes(fill = factor(DIVISION)), color = "black") +
+scale_fill_viridis_d(name = "Division ID") +
+labs(title = "Division Map", x = "Longitude", y = "Latitude") +
+theme_minimal()
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+ggplot(data = division_sf) +
+geom_sf(aes(fill = factor(DIVISION)), color = "black") +
+scale_fill_viridis_d(name = "Division ID") +
+labs(title = "Division Map", x = "Longitude", y = "Latitude") +
+theme_minimal()
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024 & OCC_MONTH==9), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024, OCC_MONTH==9), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024, OCC_MONTH=="SEP"), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+### sf plot ###
+table(analysis_data$OCC_MONTH)
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024, OCC_MONTH=="September "), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024 OCC_MONTH=="September "), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+### sf plot ###
+division_sf <- st_as_sf(analysis_data %>% filter(OCC_YEAR==2024, OCC_MONTH=="September"), coords = c("LONG_WGS84", "LAT_WGS84"), crs = 4326) %>%
+group_by(DIVISION) %>%
+summarise(geometry = st_combine(geometry)) %>%
+st_cast("POLYGON")
+ggplot(data = division_sf) +
+geom_sf(aes(fill = factor(DIVISION)), color = "black") +
+scale_fill_viridis_d(name = "Division ID") +
+labs(title = "Division Map", x = "Longitude", y = "Latitude") +
+theme_minimal()
+### premises type table ###
+kable(table(analysis_data$PREMISES_TYPE))
+### defence table ###
+kable(table(analysis_data$offence))
+### defence table ###
+kable(table(analysis_data$OFFENCE))
+### premises type table ###
+kable(table(analysis_data$PREMISES_TYPE,OCC_YEAR))
+### premises type table ###
+kable(table(analysis_data$PREMISES_TYPE,analysis_data$OCC_YEAR))
+### OFFENCE table ###
+kable(table(analysis_data$OFFENCE,analysis_data$OCC_YEAR))
+### premises type table ###
+table_data <- table(analysis_data$PREMISES_TYPE, analysis_data$OCC_YEAR)
+df_table <- as.data.frame(table_data)
+colnames(df_table) <- c("PREMISES_TYPE", "OCC_YEAR", "Count")
+df_table$OCC_YEAR <- as.numeric(as.character(df_table$OCC_YEAR))
+ggplot(df_table, aes(x = OCC_YEAR, y = Count, color = PREMISES_TYPE, group = PREMISES_TYPE)) +
+geom_line(size = 1) +
+geom_point(size = 2) +
+labs(
+title = "Trends by Premises Type Over Years",
+x = "Year",
+y = "Count of Cases",
+color = "Premises Type"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### OFFENCE table ###
+offence_table <- table(analysis_data$OFFENCE, analysis_data$OCC_YEAR)
+df_offence <- as.data.frame(offence_table)
+colnames(df_offence) <- c("OFFENCE", "OCC_YEAR", "Count")
+df_offence$OCC_YEAR <- as.numeric(as.character(df_offence$OCC_YEAR))
+ggplot(df_offence, aes(x = OCC_YEAR, y = Count, color = OFFENCE, group = OFFENCE)) +
+geom_line(size = 1) +
+geom_point(size = 2) +
+labs(
+title = "Trends by Offence Type Over Years",
+x = "Year",
+y = "Count of Cases",
+color = "Offence Type"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### DOW barchart ###
+ggplot(analysis_data, aes(x = OCC_DOW)) +
+geom_bar(fill = "steelblue", color = "black") +
+labs(
+title = "Occurrences by Day of the Week",
+x = "Day of the Week",
+y = "Number of Occurrences"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+### DAY barchart ###
+ggplot(analysis_data, aes(x = OCC_DAY)) +
+geom_bar(fill = "steelblue", color = "black") +
+labs(
+title = "Occurrences by Day of the Month",
+x = "Day of the Month",
+y = "Number of Occurrences"
+) +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+cite(kableExtra)
+We used R 4.3 for analysis and followed a public template @citeR@citeRohan. and a collection of R packages were used in this study:
+library(kableExtra)
+cite(kableExtra)
+citation(kableExtra)
+citation("kableExtra")
+citation("topmodels")
+citation("distributions3")
+citation("MASS")
+citation("sf")
+print(citation("sf"), bibtex=TRUE)
+citation("rstudioapi")
+citation("opendatatoronto")
+citation("janitor")
+par(mfrow = c(2, 2)) # Set up plotting space
+plot(poisson_model_all)
+t1 <- confint(poisson_model_all
+t1 <- confint(poisson_model_all)
+t1 <- confint(poisson_model_all)
+t1 <- confint(poisson_model_all)
+t2 <- confint(poisson_model_all)
+t2 <- confint(poisson_model_all2)
+t1
+t2
+t1 <- data.frame(confint(poisson_model_all))
+t2 <- data.frame(confint(poisson_model_all2))
+t1$
+t2
+t1 <- as.data.frame(confint(poisson_model_all))
+t2 <- as.data.frame(confint(poisson_model_all2))
+t1
+t2
+t1$model <- "Poisson Model"
+t2$model <- "Quasi-Poisson Model"
+t1
+t2
+t1 <- as.data.frame(confint(poisson_model_all))
+t2 <- as.data.frame(confint(poisson_model_all2))
+t1$model_type <- "Poisson Model"
+t2$model_type <- "Quasi-Poisson Model"
+t1
+t2
+t <- cbind(t1,t2)
+t
+t <- rbind(t1,t2)
+t
+kable(t)
+names(monthly_counts_all)
